@@ -1,16 +1,6 @@
 package cr0s.javara.main;
 import java.util.Random;
 
-
-
-
-
-
-
-
-
-
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Cursor;
@@ -78,26 +68,26 @@ public class Main extends StateBasedGame {
      * @param argv
      *            The argument passed on the command line (if any)
      */
-    public static void main(String[] argv) {
-	try {
-	    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
-		    700, false);
+    //public static void main(String[] argv) {
+	//try {
+	//    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
+	//	    700, false);
 
-	    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
-	    
-	    container.setMinimumLogicUpdateInterval(50);
-	    container.setMaximumLogicUpdateInterval(50);
-	    container.setShowFPS(false);
-	    //container.setSmoothDeltas(true);
-	    //container.setVSync(true);
-	    container.setTargetFrameRate(75);
-	    container.setClearEachFrame(false);
+	//    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
+	//
+	//    container.setMinimumLogicUpdateInterval(50);
+	//    container.setMaximumLogicUpdateInterval(50);
+	//    container.setShowFPS(false);
+	//    //container.setSmoothDeltas(true);
+	//    //container.setVSync(true);
+	//    container.setTargetFrameRate(75);
+	//    container.setClearEachFrame(false);
 
-	    container.start(); 
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-    }
+	//    container.start();
+	//} catch (Exception e) {
+	//    e.printStackTrace();
+	//}
+    //}
 
     @Override
     public void initStatesList(GameContainer arg0) throws SlickException {
