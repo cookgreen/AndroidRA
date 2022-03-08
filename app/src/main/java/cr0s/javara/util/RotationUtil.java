@@ -1,0 +1,98 @@
+package cr0s.javara.util;
+
+import org.newdawn.slick.geom.Point;
+
+import cr0s.javara.entity.actor.activity.activities.Turn.RotationDirection;
+
+public class RotationUtil {
+    public static final float FACING_TO_DEGREE = 11.25f;
+    
+    public static int getRotationFromXY(float srcX, float srcY, float x, float y) {
+	float dx = x - srcX;
+	float dy = y - srcY;
+
+	// Simply magic
+	int rot = 270 + (int) Math.toDegrees(Math.atan2(-dy, dx));
+	return (int) (rot / FACING_TO_DEGREE) % 32;
+    }
+
+    public static int quantizeFacings(int facing, int max) {
+	int step = 32 / max;
+	int a = (facing + step / 2);
+
+	return a / step;	
+    }
+
+    public static Pos facingToRecoilVector(int facing) {	
+	int facingToDegrees = (int) Math.floor(facing * FACING_TO_DEGREE);
+
+	int resX = 0;
+	int resY = 0;
+	double facingRadians = 0;
+
+	// Diagonal facings
+	if (facing % 8 != 0) {
+	    facingRadians = Math.toRadians(facingToDegrees - 90);
+	    resX = (int)  Math.signum(Math.cos(facingRadians));
+	    resY = (int) -Math.signum(Math.sin(facingRadians));	    
+	} else { // Orthogonal facings
+	    switch (facing) {
+	    case 0:
+		resX = 0;
+		resY = 1;
+		break;
+		
+	    case 8:
+		resX = 1;
+		resY = 0;
+		break;
+		
+	    case 16:
+		resX = 0;
+		resY = -1;
+		break;
+		
+	    case 24:
+		resX = -1;
+		resY = 0;
+		break;
+	    }
+	}
+
+	return new Pos(resX, resY);
+    }
+
+    public static float facingToAngle(final int sourceFacing, final int maxFacings) {
+	int facingDegrees = (int) Math.floor(sourceFacing * (360.0f / maxFacings));
+	
+	return (float) Math.toRadians(facingDegrees);
+    }
+
+    public static int angleToFacing(float angle) {
+	float facingDegrees = (float) Math.toDegrees(angle);
+	return (int) (facingDegrees / FACING_TO_DEGREE);
+    }
+
+    public static float cycle(float angle, int size) {	
+	if (angle > size) {
+	    return angle - size;
+	} else if (angle < 0) {
+	    return size + angle;
+	} else {
+	    return angle;
+	}
+    }
+    
+    public static int tickFacing(int currentFacing, int desiredFacing, int rot) {
+	int leftTurn = (currentFacing - desiredFacing) % 32;
+	int rightTurn = (desiredFacing - currentFacing) % 32;
+	
+	if (Math.min(leftTurn, rightTurn) < rot) {
+	    return desiredFacing;
+	} else if (rightTurn < leftTurn) {
+	    return (int) cycle(currentFacing + rot, 32);
+	} else {
+	    return (int) cycle(currentFacing - rot, 32);
+	}
+    }
+}

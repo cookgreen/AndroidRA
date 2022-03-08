@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.myapplication"
+        applicationId "com.android.redalert"
         minSdkVersion 16
         targetSdkVersion 30
         versionCode 1
@@ -38,6 +38,26 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'androidx.navigation:navigation-ui:2.3.0'
+    implementation files('libs\\slick.jar')
+    implementation files('libs\\AppleJavaExtensions.jar')
+    implementation files('libs\\natives-linux.jar')
+    implementation files('libs\\natives-windows.jar')
+    implementation files('libs\\lzma.jar')
+    implementation files('libs\\lwjgl-debug.jar')
+    implementation files('libs\\jinput.jar')
+    implementation files('libs\\jorbis-0.0.15.jar')
+    implementation files('libs\\lwjgl.jar')
+    implementation files('libs\\jnlp.jar')
+    implementation files('libs\\jogg-0.0.7.jar')
+    implementation files('libs\\lwjgl_util.jar')
+    implementation files('libs\\natives-mac.jar')
+    implementation files('libs\\lwjgl_test.jar')
+    implementation files('libs\\lwjgl_util_applet.jar')
+    implementation files('libs\\ibxm.jar')
+    implementation files('libs\\asm-debug-all.jar')
+    implementation files('libs\\slick-examples.jar')
+    implementation files('libs\\snakeyaml-1.13.jar')
+    implementation files('libs\\tinylinepp.jar')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

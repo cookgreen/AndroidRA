@@ -7,5 +7,8 @@ API 11 (Android 4.2)
 ## Tool
 Android Studio  
 
+## Based on
+JAVARA - cr0s  
+
 ## License  
 GPLv3
