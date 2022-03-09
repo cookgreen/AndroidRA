@@ -1,6 +1,11 @@
 package cr0s.javara.entity.effect;
 
-import java.awt.Color;
+//import java.awt.Color;
+import android.graphics.Color;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.util.LinkedList;
 
 import org.newdawn.slick.Graphics;
@@ -36,7 +41,7 @@ public class Bullet extends Projectile {
     public int trailDelay = 1;
     public int contrailLength = 0;
 
-    public Color contrailColor = Color.white;
+    public Color contrailColor = Color.valueOf(Color.WHITE);
     public boolean contrailUsePlayerColor = false;
     public int contrailDelay = 1;
 

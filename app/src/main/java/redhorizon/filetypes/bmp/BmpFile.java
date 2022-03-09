@@ -23,15 +23,11 @@ import redhorizon.filetypes.ImageFile;
 import redhorizon.utilities.channels.ReadableByteChannelAdapter;
 import static redhorizon.filetypes.ColourFormat.FORMAT_RGB;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-
-import javax.imageio.ImageIO;
 
 /**
  * Wrapper of the Java implementation for bitmap images.
