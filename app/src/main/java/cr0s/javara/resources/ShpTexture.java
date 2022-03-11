@@ -209,11 +209,11 @@ public class ShpTexture {
 	    // Check in remap table, this color in source palette needs to be changed to team-related color or not
 	    if (isRemap[i] && remapColor != null) {
 		// We need sustain source brightness and only change color from default to remapped
-		float[] hsbRemap = java.awt.Color.RGBtoHSB(remapR, remapG, remapB, null);
-		float[] hsbSource = java.awt.Color.RGBtoHSB(r, g, b, null);
+		float[] hsbRemap = net.windward.android.awt.Color.RGBtoHSB(remapR, remapG, remapB, null);
+		float[] hsbSource = net.windward.android.awt.Color.RGBtoHSB(r, g, b, null);
 
 		// Applying changes, using remapped H, S values and source B value
-		java.awt.Color newColor = java.awt.Color.getHSBColor(hsbRemap[0], hsbRemap[1], hsbSource[2]);
+			net.windward.android.awt.Color newColor = net.windward.android.awt.Color.getHSBColor(hsbRemap[0], hsbRemap[1], hsbSource[2]);
 		colors[i] = new Color(newColor.getRed(), newColor.getGreen(), newColor.getBlue());
 	    }
 	}

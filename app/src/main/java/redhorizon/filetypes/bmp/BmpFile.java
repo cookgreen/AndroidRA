@@ -23,6 +23,10 @@ import redhorizon.filetypes.ImageFile;
 import redhorizon.utilities.channels.ReadableByteChannelAdapter;
 import static redhorizon.filetypes.ColourFormat.FORMAT_RGB;
 
+import net.windward.android.awt.image.BufferedImage;
+import net.windward.android.awt.image.DataBufferByte;
+import net.windward.android.imageio.ImageIO;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;

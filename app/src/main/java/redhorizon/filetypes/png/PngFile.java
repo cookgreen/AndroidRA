@@ -35,9 +35,9 @@ import redhorizon.utilities.ImageUtility;
 import redhorizon.utilities.channels.ReadableByteChannelAdapter;
 import static redhorizon.filetypes.ColourFormat.*;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.IndexColorModel;
+import net.windward.android.awt.image.BufferedImage;
+import net.windward.android.awt.image.DataBufferByte;
+import net.windward.android.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -46,7 +46,7 @@ import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Paths;
 
-import javax.imageio.ImageIO;
+import net.windward.android.imageio.ImageIO;
 
 /**
  * Wrapper of the Java implementation of Portable Network Graphics (PNG) images.
