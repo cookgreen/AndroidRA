@@ -38,7 +38,6 @@ android {
 }
 
 dependencies {
-    implementation files('libs\\gdx-backend-lwjgl.jar')
     runtimeOnly "com.badlogicgames.gdx:gdx-platform:1.10.0:natives-armeabi-v7a"
     runtimeOnly "com.badlogicgames.gdx:gdx-platform:1.10.0:natives-arm64-v8a"
     runtimeOnly "com.badlogicgames.gdx:gdx-platform:1.10.0:natives-x86"
@@ -54,6 +53,7 @@ dependencies {
     implementation files('libs\\sfntly-0.0.1-SNAPSHOT.jar')
     implementation files('libs\\gdx.jar')
     implementation files('libs\\gdx-backend-android.jar')
+    implementation files('libs\\lwjgl.aar')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

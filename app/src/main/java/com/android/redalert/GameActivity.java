@@ -14,6 +14,10 @@ public class GameActivity extends SlickActivity {
     {
         super.onCreate(savedInstanceState);
 
-        start(new Main());
+        Main mainGame = new Main();
+        mainGame.RegiserApp(getApplicationContext());
+        mainGame.Init();
+
+        start(mainGame);
     }
 }

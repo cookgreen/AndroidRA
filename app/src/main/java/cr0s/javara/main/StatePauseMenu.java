@@ -1,8 +1,9 @@
 package cr0s.javara.main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengles.GLES20;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -232,7 +233,7 @@ public class StatePauseMenu extends BasicGameState implements MouseListener, Inp
 		this.MENU_HEIGHT = MENU_FRAME_HORIZ_HEIGHT + menuItems.size() * (this.MENU_BUTTON_HEIGHT + MENU_BUTTONS_SPACE);
 		
 		try {
-			this.ss = new SpriteSheet(ResourceManager.RESOURCE_FOLDER + "dialog.png", 1024, 512);
+			this.ss = new SpriteSheet("dialog.png",ResourceManager.getInstance().OpenResourcesFile("dialog.png"), 1024, 512);
 			
 			this.menuBackground = ss.getSubImage(0, 0, MENU_WIDTH, MENU_HEIGHT);
 			this.menuFrameVert = ss.getSubImage(480, 0, MENU_FRAME_VERT_WIDTH, MENU_FRAME_VERT_HEIGHT);
@@ -243,7 +244,7 @@ public class StatePauseMenu extends BasicGameState implements MouseListener, Inp
 			this.menuButton = ss.getSubImage(512, -1, MENU_BUTTON_SIZE_SHEET, MENU_BUTTON_SIZE_SHEET + 2);
 			this.menuButtonMouseover = ss.getSubImage(512, 127, MENU_BUTTON_SIZE_SHEET, MENU_BUTTON_SIZE_SHEET);
 			this.menuButtonPressed = ss.getSubImage(512 + 128, 127, MENU_BUTTON_SIZE_SHEET, MENU_BUTTON_SIZE_SHEET);
-		} catch (SlickException e) {
+		} catch (SlickException | IOException e) {
 			e.printStackTrace();
 		}
 	}

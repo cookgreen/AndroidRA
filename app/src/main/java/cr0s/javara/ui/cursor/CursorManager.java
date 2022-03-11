@@ -116,20 +116,20 @@ public class CursorManager {
     }
     
     public void update() {
-	int x = Main.getInstance().getContainer().getInput().getMouseX();
-	int y = Main.getInstance().getContainer().getInput().getMouseY();
-	
-	this.currentX = x;
-	this.currentY = y;
-	
-	if (this.currentCursorSequence != null) {
-	    this.currentCursorSequence.update(0);
-	}
+	//int x = Main.getInstance().getContainer().getInput().getMouseX();
+	//int y = Main.getInstance().getContainer().getInput().getMouseY();
+	//
+	//this.currentX = x;
+	//this.currentY = y;
+	//
+	//if (this.currentCursorSequence != null) {
+	//    this.currentCursorSequence.update(0);
+	//}
     }
     
     public void drawCursor(Graphics g) {
-	if (this.currentCursorSequence != null) {
-	    this.currentCursorSequence.render(this.currentX + this.currentCursorSequence.offsetX, this.currentY + this.currentCursorSequence.offsetY);
-	}
+	//if (this.currentCursorSequence != null) {
+	//    this.currentCursorSequence.render(this.currentX + this.currentCursorSequence.offsetX, this.currentY + this.currentCursorSequence.offsetY);
+	//}
     }
 }

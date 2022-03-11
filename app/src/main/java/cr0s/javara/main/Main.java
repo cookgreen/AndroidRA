@@ -1,10 +1,9 @@
 package cr0s.javara.main;
+import android.content.Context;
+
 import java.util.Random;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Cursor;
-import org.lwjgl.input.Mouse;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -49,10 +48,21 @@ public class Main extends StateBasedGame {
     private GameSideBar gsb;
     private ShroudRenderer observerShroudRenderer;
 
+    private Context appContext;
+
     public Main() {
 	super("JavaRA");
 	//SoundStore.get().init();
     }
+
+    public void RegiserApp(Context appContext)
+	{
+		this.appContext = appContext;
+	}
+
+	public void Init(){
+    	ResourceManager.getInstance().Init(appContext.getAssets());
+	}
 
     public static Main getInstance() {
 	if (instance == null) {
@@ -64,40 +74,40 @@ public class Main extends StateBasedGame {
 
 
     public void Run() {
-	try {
-	    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
-		    700, true);
-	    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
+		try {
+		    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
+			    700, true);
+		    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
 
-	    container.setMinimumLogicUpdateInterval(50);
-	    container.setMaximumLogicUpdateInterval(50);
-	    container.setShowFPS(false);
-	    //container.setSmoothDeltas(true);
-	    //container.setVSync(true);
-	    container.setTargetFrameRate(75);
-	    container.setClearEachFrame(false);
-	    container.start();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+		    container.setMinimumLogicUpdateInterval(50);
+		    container.setMaximumLogicUpdateInterval(50);
+		    container.setShowFPS(false);
+		    //container.setSmoothDeltas(true);
+		    //container.setVSync(true);
+		    container.setTargetFrameRate(75);
+		    container.setClearEachFrame(false);
+		    container.start();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
     }
 
     @Override
     public void initStatesList(GameContainer arg0) throws SlickException {
-	this.addState(new StateMainMenu());		
-	this.addState(new StateGameMap(arg0));
-	this.addState(new StatePauseMenu());
-	this.addState(new StateLoadingScreen());
-	this.addState(new StateTestScreen());
+	  this.addState(new StateMainMenu());
+	  this.addState(new StateGameMap(arg0));
+	  this.addState(new StatePauseMenu());
+	  this.addState(new StateLoadingScreen());
+	  this.addState(new StateTestScreen());
 
-	// Disable native cursor
-	Cursor emptyCursor;
-	try {
-	    emptyCursor = new Cursor(1, 1, 0, 0, 1, BufferUtils.createIntBuffer(1), null);
-	    Mouse.setNativeCursor(emptyCursor);	  		
-	} catch (LWJGLException e) {
-	    e.printStackTrace();
-	}
+	  // Disable native cursor
+	  //Cursor emptyCursor;
+	  try {
+	      //emptyCursor = new Cursor(1, 1, 0, 0, 1, BufferUtils.createIntBuffer(1), null);
+	      //Mouse.setNativeCursor(emptyCursor);
+	  } catch (Exception e) {
+	      e.printStackTrace();
+	  }
     }
 
     public Camera getCamera() {
@@ -116,73 +126,73 @@ public class Main extends StateBasedGame {
 	this.w = w;
     }
 
-    public void startNewGame(String mapName) {	
-	rm = ResourceManager.getInstance();
-	rm.loadBibs();
+    public void startNewGame(String mapName) {
+		rm = ResourceManager.getInstance();
+		rm.loadBibs();
 
-	camera = new Camera();
-	try {
-	    camera.init(this.getContainer());
-	} catch (SlickException e1) {
-	    e1.printStackTrace();
-	}
+		camera = new Camera();
+		try {
+		    camera.init(this.getContainer());
+		} catch (SlickException e1) {
+		    e1.printStackTrace();
+		}
 
-	controller = new Controller(null, camera, this.getContainer().getInput());	
-	w = new World("haos-ridges",
-		this.getContainer(), camera);
+		controller = new Controller(null, camera, this.getContainer().getInput());
+		w = new World("haos-ridges",
+			this.getContainer(), camera);
 
-	initGame();
+		initGame();
     }
 
     public void initGame() {
-	Random r = new Random();
+		Random r = new Random();
 
-	this.observerShroudRenderer = new ShroudRenderer(w);
+		this.observerShroudRenderer = new ShroudRenderer(w);
 
-	team = new Team();
-	player = new Player(w, "Player", Alignment.SOVIET, new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256)));
-	player.setTeam(team);
+		team = new Team();
+		player = new Player(w, "Player", Alignment.SOVIET, new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256)));
+		player.setTeam(team);
 
-	//player.setShroud(null);
-	
-	bo = new BuildingOverlay(player, w);
+		//player.setShroud(null);
 
-	w.addPlayer(player);
+		bo = new BuildingOverlay(player, w);
 
-	Pos playerSpawn = player.getPlayerSpawnPoint();	
+		w.addPlayer(player);
 
-	//this.getCamera().setOffset(-Math.max(w.getMap().getBounds().getMinX(), (playerSpawn.getX() * 24) - this.getContainer().getWidth() / 2), -Math.max(w.getMap().getBounds().getMinY(), (playerSpawn.getY() * 24)));
+		Pos playerSpawn = player.getPlayerSpawnPoint();
 
-	this.getCamera().scrollCenterToCell(playerSpawn);
-	
-	this.gsb = new GameSideBar(Main.getInstance().getTeam(), Main.getInstance().getPlayer());
-	this.gsb.initSidebarPages();
-	
-	Team team2 = new Team();
-	Player otherPlayer = new AIPlayer(w, "NormalAI", Alignment.SOVIET, new Color(128, 0, 0));
-	player.setTeam(team2);
-	w.addPlayer(otherPlayer);
-    }
+		//this.getCamera().setOffset(-Math.max(w.getMap().getBounds().getMinX(), (playerSpawn.getX() * 24) - this.getContainer().getWidth() / 2), -Math.max(w.getMap().getBounds().getMinY(), (playerSpawn.getY() * 24)));
+
+		this.getCamera().scrollCenterToCell(playerSpawn);
+
+		this.gsb = new GameSideBar(Main.getInstance().getTeam(), Main.getInstance().getPlayer());
+		this.gsb.initSidebarPages();
+
+		Team team2 = new Team();
+		Player otherPlayer = new AIPlayer(w, "NormalAI", Alignment.SOVIET, new Color(128, 0, 0));
+		player.setTeam(team2);
+		w.addPlayer(otherPlayer);
+    	}
 
 
-    public Player getPlayer() {
-	return this.player;
-    }
+    	public Player getPlayer() {
+		return this.player;
+    	}
 
-    public Team getTeam() {
-	return this.player.getTeam();
+    	public Team getTeam() {
+		return this.player.getTeam();
     }
 
 
     public GameSideBar getSideBar() {
-	return this.gsb;
+		return this.gsb;
     }
 
     public ShroudRenderer getObserverShroudRenderer() {
-	return this.observerShroudRenderer;
+		return this.observerShroudRenderer;
     }
 
     public BuildingOverlay getBuildingOverlay() {
-	return this.bo;
+		return this.bo;
     }
 }

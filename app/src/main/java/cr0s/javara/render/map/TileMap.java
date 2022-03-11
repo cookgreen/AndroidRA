@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengles.GLES20;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;

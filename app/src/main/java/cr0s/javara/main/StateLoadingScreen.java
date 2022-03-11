@@ -2,7 +2,7 @@ package cr0s.javara.main;
 
 import java.util.ArrayList;
 
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengles.GLES20;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;

@@ -331,7 +331,7 @@ public class Soundly {
 	listenerPos = BufferUtils.createFloatBuffer(3).put( 
 		new float[] { listenerX, listenerDepth, listenerY } );
 	listenerPos.flip();
-	AL10.alListener(AL10.AL_POSITION, listenerPos);
+	AL10.alListenerfv(AL10.AL_POSITION, listenerPos);
 
 	sourceVel.clear();
 	sourceVel.put(new float[] { 0, 0, 0 });
@@ -493,7 +493,7 @@ public class Soundly {
 	    listenerPos.put( 1, depth*s );
 	    listenerPos.put( 2, y*s );
 	    //TODO: make float buffer changing more consistent between this and sourcePos
-	    AL10.alListener( AL10.AL_POSITION, listenerPos);
+	    AL10.alListenerfv( AL10.AL_POSITION, listenerPos);
 	    distanceChanged();
 	}
     }
@@ -674,7 +674,7 @@ public class Soundly {
 	sourcePos.clear();
 	sourcePos.put(new float[] { x*s, depth*s, y*s });
 	sourcePos.flip();
-	AL10.alSource(source, AL10.AL_POSITION, sourcePos);
+	AL10.alListenerfv(source, sourcePos);
     }
 
     public static boolean sourceSeek(int source, float secOffset) {
@@ -824,7 +824,7 @@ public class Soundly {
 		if (!(sound instanceof XStreamingSound)) {
 		    setSourceAudio(source, sound.getAudio().getBufferID());
 		}
-		AL10.alSource(source, AL10.AL_VELOCITY, sourceVel);
+		AL10.alSourcefv(source, AL10.AL_VELOCITY, sourceVel);
 
 		//tell the sound to update its own sources (and that we are initializing!)
 		sound.updateOpenAL(source, sourceIndex, delta, true);

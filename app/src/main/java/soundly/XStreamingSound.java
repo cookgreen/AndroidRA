@@ -11,7 +11,6 @@ import java.net.URL;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.OpenALException;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.util.Log;
@@ -149,7 +148,7 @@ public class XStreamingSound extends XSound {
         if (!stopped && modPlayer != null) {
             try {
                 modPlayer.update();
-            } catch (OpenALException e) {
+            } catch (Exception e) {
                 Log.error("Error with OpenGL MOD Player on this this platform");
                 Log.error(e);
             }
@@ -157,7 +156,7 @@ public class XStreamingSound extends XSound {
         if (!stopped && streamPlayer != null) {
             try {
                 streamPlayer.update();
-            } catch (OpenALException e) {
+            } catch (Exception e) {
                 Log.error("Error with OpenGL Streaming Player on this this platform");
                 Log.error(e);
                 streamPlayer = null;

@@ -1,5 +1,7 @@
 package cr0s.javara.resources;
 
+import android.content.res.AssetManager;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,9 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Cursor;
-import org.lwjgl.util.WaveData;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -40,9 +39,10 @@ import redhorizon.filetypes.tmp.TmpFileRA;
 import soundly.XSound;
 
 public class ResourceManager {
+	private  AssetManager assetManager;
 
     private static ResourceManager instance;
-    public static final String ROOT_FOLDER = System.getProperty("user.dir")
+    public static String ROOT_FOLDER = System.getProperty("user.dir")
 	    + System.getProperty("file.separator");
 
     public static final String RESOURCE_FOLDER = ROOT_FOLDER + "assets"
@@ -60,7 +60,7 @@ public class ResourceManager {
     
     public static final String SIDEBAR_CATEGORIES_SHEET = RESOURCE_FOLDER + "sidebar_buttons.png";
 
-    public static Cursor pointerCursor;
+    //public static Cursor pointerCursor;
     private HashMap<String, MixFile> mixes = new HashMap<>();
     private HashMap<String, ShpTexture> commonTextureSources = new HashMap<>();
     private HashMap<String, ShpTexture> shpTextureSources = new HashMap<>();
@@ -82,11 +82,40 @@ public class ResourceManager {
 	return instance;
     }
 
+    public void Init(AssetManager assetManager)
+	{
+		this.assetManager = assetManager;
+	}
+
     public void loadBibs() {
 	bib1 = new SpriteSheet(getTemplateShpTexture("temperat", "bib1.tem").getAsCombinedImage(null), 24, 24);
 	bib2 = new SpriteSheet(getTemplateShpTexture("temperat", "bib2.tem").getAsCombinedImage(null), 24, 24);
 	bib3 = new SpriteSheet(getTemplateShpTexture("temperat", "bib3.tem").getAsCombinedImage(null), 24, 24);
     }
+
+    public InputStream OpenFile(String path) throws IOException {
+		return assetManager.open(path);
+	}
+
+	public InputStream OpenResourcesFile(String path) throws IOException {
+		return assetManager.open("resources/" + path);
+	}
+
+	public InputStream OpenResourcesPalFile(String path) throws IOException {
+		return assetManager.open("resources/pal/" + path);
+	}
+
+	public InputStream OpenTilesetsFile(String path) throws IOException {
+		return assetManager.open("tilesets/" + path);
+	}
+
+	public InputStream OpenAIFile(String path) throws IOException {
+		return assetManager.open("ai/" + path);
+	}
+
+	public InputStream OpenMapsFile(String path) throws IOException {
+		return assetManager.open("maps/" + path);
+	}
 
     public SpriteSheet getBibSheet(BibType bt) {
 	switch (bt) {

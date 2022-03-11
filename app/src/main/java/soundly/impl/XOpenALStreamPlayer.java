@@ -12,7 +12,6 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
-import org.lwjgl.openal.OpenALException;
 import org.newdawn.slick.openal.OggInputStream;
 import org.newdawn.slick.util.Log;
 import org.newdawn.slick.util.ResourceLoader;
@@ -235,7 +234,7 @@ public class XOpenALStreamPlayer {
 				int format = audio.getChannels() > 1 ? AL10.AL_FORMAT_STEREO16 : AL10.AL_FORMAT_MONO16;
 				try {
 					AL10.alBufferData(bufferId, format, bufferData, audio.getRate());
-				} catch (OpenALException e) {
+				} catch (Exception e) {
 					Log.error("Failed to loop buffer: "+bufferId+" "+format+" "+count+" "+audio.getRate(), e);
 					return false;
 				}
