@@ -2,9 +2,11 @@ package com.android.redalert;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
+import org.newdawn.slick.SlickActivity;
 
-public class GameActivity extends AppCompatActivity {
+import cr0s.javara.main.Main;
+
+public class GameActivity extends SlickActivity {
     private GameSurfaceView gameSurfaceView;
 
     @Override
@@ -12,7 +14,6 @@ public class GameActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
 
-        gameSurfaceView = new GameSurfaceView(this);
-        setContentView(gameSurfaceView);
+        start(new Main());
     }
 }

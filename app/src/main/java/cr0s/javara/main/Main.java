@@ -62,32 +62,25 @@ public class Main extends StateBasedGame {
 	return instance;
     }
 
-    /**
-     * Entry point.
-     * 
-     * @param argv
-     *            The argument passed on the command line (if any)
-     */
-    //public static void main(String[] argv) {
-	//try {
-	//    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
-	//	    700, false);
 
-	//    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
-	//
-	//    container.setMinimumLogicUpdateInterval(50);
-	//    container.setMaximumLogicUpdateInterval(50);
-	//    container.setShowFPS(false);
-	//    //container.setSmoothDeltas(true);
-	//    //container.setVSync(true);
-	//    container.setTargetFrameRate(75);
-	//    container.setClearEachFrame(false);
+    public void Run() {
+	try {
+	    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
+		    700, true);
+	    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
 
-	//    container.start();
-	//} catch (Exception e) {
-	//    e.printStackTrace();
-	//}
-    //}
+	    container.setMinimumLogicUpdateInterval(50);
+	    container.setMaximumLogicUpdateInterval(50);
+	    container.setShowFPS(false);
+	    //container.setSmoothDeltas(true);
+	    //container.setVSync(true);
+	    container.setTargetFrameRate(75);
+	    container.setClearEachFrame(false);
+	    container.start();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    }
 
     @Override
     public void initStatesList(GameContainer arg0) throws SlickException {
