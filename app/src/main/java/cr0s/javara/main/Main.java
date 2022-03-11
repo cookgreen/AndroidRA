@@ -51,7 +51,7 @@ public class Main extends StateBasedGame {
 
     public Main() {
 	super("JavaRA");
-	SoundStore.get().init();
+	//SoundStore.get().init();
     }
 
     public static Main getInstance() {
