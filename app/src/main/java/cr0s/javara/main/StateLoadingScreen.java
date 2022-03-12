@@ -21,7 +21,7 @@ import cr0s.javara.resources.ResourceManager;
 import cr0s.javara.ui.cursor.CursorManager;
 import cr0s.javara.ui.cursor.CursorType;
 
-public class StateLoadingScreen extends BasicGameState implements MouseListener, InputListener {
+public class StateLoadingScreen extends InputGameState {
 
     public static final int STATE_ID = 3;
 

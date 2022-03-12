@@ -22,7 +22,7 @@ import cr0s.javara.ui.cursor.CursorManager;
 import cr0s.javara.ui.cursor.CursorType;
 import cr0s.javara.util.Pos;
 
-public class StateTestScreen extends BasicGameState implements MouseListener, InputListener {
+public class StateTestScreen extends InputGameState {
 
     public static final int STATE_ID = 4;
 

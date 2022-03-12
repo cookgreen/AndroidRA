@@ -21,7 +21,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import cr0s.javara.resources.ResourceManager;
 import cr0s.javara.ui.cursor.CursorManager;
 
-public class StatePauseMenu extends BasicGameState implements MouseListener, InputListener {
+public class StatePauseMenu extends InputGameState {
 
 	public static final int STATE_ID = 2;
 	

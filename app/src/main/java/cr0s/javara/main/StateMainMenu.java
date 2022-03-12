@@ -1,5 +1,7 @@
 package cr0s.javara.main;
 
+import com.badlogic.gdx.InputProcessor;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -22,7 +24,7 @@ import cr0s.javara.resources.ResourceManager;
 import cr0s.javara.ui.cursor.CursorManager;
 import cr0s.javara.ui.cursor.CursorType;
 
-public class StateMainMenu extends BasicGameState implements MouseListener, InputListener {
+public class StateMainMenu extends InputGameState {
 
 	public static final int STATE_ID = 0;
 	
@@ -58,29 +60,6 @@ public class StateMainMenu extends BasicGameState implements MouseListener, Inpu
 	public StateMainMenu() {
 	    
 	}
-	
-	@Override
-	public void mouseClicked(int arg0, int arg1, int arg2, int arg3) {	
-	}
-
-	@Override
-	public void mouseDragged(int arg0, int arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseMoved(int arg0, int arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(int button, int x, int y) {
-		if (button == 0) {
-			this.leftMousePressed = true;
-		}
-	}
 
 	@Override
 	public void mouseReleased(int button, int arg1, int arg2) {
@@ -91,7 +70,7 @@ public class StateMainMenu extends BasicGameState implements MouseListener, Inpu
 				if (m.isSelected) {
 					switch (m.id) {
 						case 0:
-							Main.getInstance().enterState(3);
+							Main.getInstance().ChangeStateByID(3);
 							break;
 							
 						case 2:
@@ -101,108 +80,6 @@ public class StateMainMenu extends BasicGameState implements MouseListener, Inpu
 				}
 			}
 		}
-	}
-
-	@Override
-	public void mouseWheelMoved(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void inputEnded() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void inputStarted() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isAcceptingInput() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public void setInput(Input arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyPressed(int arg0, char arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(int arg0, char arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerButtonPressed(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerButtonReleased(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerDownPressed(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerDownReleased(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerLeftPressed(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerLeftReleased(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerRightPressed(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerRightReleased(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerUpPressed(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void controllerUpReleased(int arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -325,7 +202,72 @@ public class StateMainMenu extends BasicGameState implements MouseListener, Inpu
 			throws SlickException {
 	    CursorManager.getInstance().update();
 	}
-	
+
+	@Override
+	public boolean keyDown(int i) {
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int i) {
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char c) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int posX, int posY, int pointer, int i3) {
+		for (int i = 0; i < menuItems.size(); i++) {
+			MainMenuItem m = this.menuItems.get(i);
+
+			float itemX = this.menuX + 25.0f;
+			float itemY = this.menuY + 25.0f + (i * (this.MENU_BUTTON_HEIGHT + this.MENU_BUTTONS_SPACE));
+
+			m.boundingBox.setBounds(itemX, itemY, this.MENU_BUTTON_WIDTH, this.MENU_BUTTON_HEIGHT);
+
+			if (m.boundingBox.contains(posX, posY)) {
+				m.isSelected = true;
+
+				switch (m.id) {
+					case 0:
+						Main.getInstance().ChangeStateByID(3);
+						break;
+					case 2:
+						c.exit();
+						break;
+				}
+			} else {
+				m.isMouseOver = false;
+				m.isSelected = false;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int posX, int posY, int pointer, int i3) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int i, int i1, int i2) {
+		return false;
+	}
+
+	@Override
+	public boolean touchMoved(int i, int i1) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int i) {
+		return false;
+	}
+
 	private class MainMenuItem {
 		public int id;
 		public String text;

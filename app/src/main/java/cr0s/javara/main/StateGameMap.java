@@ -27,7 +27,7 @@ import cr0s.javara.ui.cursor.CursorManager;
 import cr0s.javara.ui.cursor.CursorType;
 import cr0s.javara.util.Pos;
 
-public class StateGameMap extends BasicGameState {
+public class StateGameMap extends InputGameState {
     public static final int STATE_ID = 1;
 
     private GameContainer container;

@@ -97,24 +97,24 @@ public class ResourceManager {
 		return assetManager.open(path);
 	}
 
-	public InputStream OpenResourcesFile(String path) throws IOException {
-		return assetManager.open("resources/" + path);
+	public InputStream OpenResourcesFile(String file) throws IOException {
+		return assetManager.open("resources/" + file);
 	}
 
-	public InputStream OpenResourcesPalFile(String path) throws IOException {
-		return assetManager.open("resources/pal/" + path);
+	public InputStream OpenResourcesPalFile(String file) throws IOException {
+		return assetManager.open("resources/pal/" + file);
 	}
 
-	public InputStream OpenTilesetsFile(String path) throws IOException {
-		return assetManager.open("tilesets/" + path);
+	public InputStream OpenTilesetsFile(String file) throws IOException {
+		return assetManager.open("tilesets/" + file);
 	}
 
-	public InputStream OpenAIFile(String path) throws IOException {
-		return assetManager.open("ai/" + path);
+	public InputStream OpenAIFile(String file) throws IOException {
+		return assetManager.open("ai/" + file);
 	}
 
-	public InputStream OpenMapsFile(String path) throws IOException {
-		return assetManager.open("maps/" + path);
+	public InputStream OpenMapsFile(String file) throws IOException {
+		return assetManager.open("maps/" + file);
 	}
 
     public SpriteSheet getBibSheet(BibType bt) {

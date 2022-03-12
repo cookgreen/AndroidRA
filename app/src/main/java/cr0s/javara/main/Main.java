@@ -1,6 +1,10 @@
 package cr0s.javara.main;
 import android.content.Context;
 
+import com.android.redalert.GameActivity;
+import com.badlogic.gdx.backends.android.AndroidInput;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.lwjgl.BufferUtils;
@@ -10,6 +14,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.opengl.renderer.Renderer;
+import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import cr0s.javara.ai.AIPlayer;
@@ -49,56 +54,50 @@ public class Main extends StateBasedGame {
     private ShroudRenderer observerShroudRenderer;
 
     private Context appContext;
+    private AndroidInput androidInput;
+    private ArrayList<InputGameState> gameStates;
 
     public Main() {
-	super("JavaRA");
-	//SoundStore.get().init();
+    	super("JavaRA");
+    	gameStates = new ArrayList<>();
     }
 
-    public void RegiserApp(Context appContext)
-	{
-		this.appContext = appContext;
-	}
+	public void Init(Context appContext, AndroidInput androidInput){
+    	this.appContext = appContext;
+		this.androidInput = androidInput;
 
-	public void Init(){
     	ResourceManager.getInstance().Init(appContext.getAssets());
 	}
 
     public static Main getInstance() {
-	if (instance == null) {
-	    instance = new Main();
-	}
-
-	return instance;
-    }
-
-
-    public void Run() {
-		try {
-		    AppGameContainer container = new AppGameContainer(Main.getInstance(), 1200,
-			    700, true);
-		    //Renderer.setRenderer(Renderer.VERTEX_ARRAY_RENDERER);
-
-		    container.setMinimumLogicUpdateInterval(50);
-		    container.setMaximumLogicUpdateInterval(50);
-		    container.setShowFPS(false);
-		    //container.setSmoothDeltas(true);
-		    //container.setVSync(true);
-		    container.setTargetFrameRate(75);
-		    container.setClearEachFrame(false);
-		    container.start();
-		} catch (Exception e) {
-		    e.printStackTrace();
+		if (instance == null) {
+	    	instance = new Main();
 		}
+
+		return instance;
     }
 
     @Override
     public void initStatesList(GameContainer arg0) throws SlickException {
-	  this.addState(new StateMainMenu());
-	  this.addState(new StateGameMap(arg0));
-	  this.addState(new StatePauseMenu());
-	  this.addState(new StateLoadingScreen());
-	  this.addState(new StateTestScreen());
+	  StateMainMenu mainMenuState = new StateMainMenu();
+	  StateGameMap gameMapState = new StateGameMap(arg0);
+	  StatePauseMenu pauseMenuState = new StatePauseMenu();
+	  StateLoadingScreen loadingScreenState = new StateLoadingScreen();
+	  StateTestScreen testScreenSatte = new StateTestScreen();
+
+	  this.addState(mainMenuState);
+	  this.addState(gameMapState);
+	  this.addState(pauseMenuState);
+	  this.addState(loadingScreenState);
+	  this.addState(testScreenSatte);
+
+	  gameStates.add(mainMenuState);
+	  gameStates.add(gameMapState);
+	  gameStates.add(pauseMenuState);
+	  gameStates.add(loadingScreenState);
+	  gameStates.add(testScreenSatte);
+
+	  androidInput.setInputProcessor(mainMenuState);
 
 	  // Disable native cursor
 	  //Cursor emptyCursor;
@@ -172,14 +171,28 @@ public class Main extends StateBasedGame {
 		Player otherPlayer = new AIPlayer(w, "NormalAI", Alignment.SOVIET, new Color(128, 0, 0));
 		player.setTeam(team2);
 		w.addPlayer(otherPlayer);
-    	}
+    }
 
+    public void ChangeStateByID(int id)
+	{
+		InputGameState gameState = null;
+		for(int i=0;i<gameStates.size();i++)
+		{
+			if(gameStates.get(i).getID()==id)
+			{
+				gameState = gameStates.get(i);
+				break;
+			}
+		}
+		androidInput.setInputProcessor(gameState);
+		enterState(id);
+	}
 
-    	public Player getPlayer() {
+    public Player getPlayer() {
 		return this.player;
     	}
 
-    	public Team getTeam() {
+    public Team getTeam() {
 		return this.player.getTeam();
     }
 
