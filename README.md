@@ -5,10 +5,10 @@ Make Red Alert can run on Android platform
 ## Android API  
 API 26 (Android 8.0)  
 
-## Tool
-Android Studio  
-
-## Based on
+## Libraries  
+LibGDX (Android)  
+Slick2D (AE)  
+LWJGL (Android)  
 JavaRA - cr0s  
 
 ## License  
