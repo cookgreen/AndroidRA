@@ -23,11 +23,13 @@ import redhorizon.filetypes.ImageFile;
 import redhorizon.filetypes.ImagesFile;
 import redhorizon.filetypes.PalettedInternal;
 import redhorizon.filetypes.WritableFile;
+import redhorizon.filetypes.mix.MixRecordByteChannel;
 import redhorizon.utilities.CodecUtility;
 import redhorizon.utilities.ImageUtility;
 import static redhorizon.filetypes.ColourFormat.FORMAT_INDEXED;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.GatheringByteChannel;
@@ -51,21 +53,106 @@ public class ShpFileCnc extends ShpFile<ShpFileHeaderCnc> implements AnimationFi
 	// Save-to information
 	private static final int MAX_HEIGHT = 65535;
 
+
+	public ShpFileCnc(String name, InputStream inputStream) {
+
+		super(name);
+
+		try {
+			byte[] bytes = new byte[ShpFileHeaderCnc.HEADER_SIZE];
+			inputStream.read(bytes);
+
+			// Construct file header
+			ByteBuffer headerbytes = ByteBuffer.wrap(bytes);
+			headerbytes.order(ByteOrder.LITTLE_ENDIAN);
+			headerbytes.rewind();
+
+			shpfileheader = new ShpFileHeaderCnc(headerbytes);
+			//System.out.println("NumImages: " + shpfileheader.numimages + " | Width: " + shpfileheader.width + " | Height: " + shpfileheader.height);
+
+			ShpImageOffsetCnc[] offsets = new ShpImageOffsetCnc[numImages() + 2];
+			for (int i = 0; i < numImages() + 2; i++) {
+				bytes = new byte[ShpImageOffsetCnc.OFFSET_SIZE];
+				inputStream.read(bytes);
+
+				ByteBuffer offsetbytes = ByteBuffer.wrap(bytes);
+				offsetbytes.order(ByteOrder.LITTLE_ENDIAN);
+				offsetbytes.rewind();
+
+				offsets[i] = new ShpImageOffsetCnc(offsetbytes);
+			}
+
+			shpimages = new ByteBuffer[numImages()];
+
+			for (int i = 0; i < numImages(); i++) {
+				ShpImageOffsetCnc imageoffset = offsets[i];
+
+				bytes = new byte[offsets[i + 1].offset - imageoffset.offset];
+				inputStream.read(bytes);
+
+				// Format conversion buffers
+				ByteBuffer sourcebytes = ByteBuffer.wrap(bytes);
+				sourcebytes.rewind();
+
+				ByteBuffer destbytes = ByteBuffer.allocate(width() * height());
+
+				switch (imageoffset.offsetformat) {
+					// Format80 image
+					case FORMAT80:
+						CodecUtility.decodeFormat80(sourcebytes, destbytes);
+						break;
+
+					// Format40 image
+					case FORMAT40:
+						int refoffset = imageoffset.refoff;
+						int j;
+						for (j = 0; j < numImages(); j++) {
+							if (refoffset == offsets[j].offset) {
+								break;
+							}
+						}
+						CodecUtility.decodeFormat40(sourcebytes, destbytes, shpimages[j]);
+						break;
+
+					// Format20 image
+					case FORMAT20:
+						CodecUtility.decodeFormat20(sourcebytes, shpimages[i - 1], destbytes);
+						break;
+				}
+
+				// Add the decompressed image to the image array
+				shpimages[i] = destbytes;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				inputStream.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
 	/**
 	 * Constructor, creates a new shp file with the given name and file data.
 	 * 
 	 * @param name		  The name of this file.
 	 * @param bytechannel Data of the file.
 	 */
-	public ShpFileCnc(String name, ReadableByteChannel bytechannel) {
+	public ShpFileCnc(String name, MixRecordByteChannel bytechannel) {
 
 		super(name);
 
 		try {
-			// Construct file header
 			ByteBuffer headerbytes = ByteBuffer.allocate(ShpFileHeaderCnc.HEADER_SIZE);
-			headerbytes.order(ByteOrder.LITTLE_ENDIAN);
 			bytechannel.read(headerbytes);
+
+			// Construct file header
+			headerbytes.order(ByteOrder.LITTLE_ENDIAN);
 			headerbytes.rewind();
 			
 			shpfileheader = new ShpFileHeaderCnc(headerbytes);
@@ -74,9 +161,9 @@ public class ShpFileCnc extends ShpFile<ShpFileHeaderCnc> implements AnimationFi
 			ShpImageOffsetCnc[] offsets = new ShpImageOffsetCnc[numImages() + 2];
 			for (int i = 0; i < numImages() + 2; i++) {
 				ByteBuffer offsetbytes = ByteBuffer.allocate(ShpImageOffsetCnc.OFFSET_SIZE);
-				
-				offsetbytes.order(ByteOrder.LITTLE_ENDIAN);
 				bytechannel.read(offsetbytes);
+
+				offsetbytes.order(ByteOrder.LITTLE_ENDIAN);
 				offsetbytes.rewind();
 				
 				offsets[i] = new ShpImageOffsetCnc(offsetbytes);
@@ -87,9 +174,11 @@ public class ShpFileCnc extends ShpFile<ShpFileHeaderCnc> implements AnimationFi
 			for (int i = 0; i < numImages(); i++) {
 				ShpImageOffsetCnc imageoffset = offsets[i];
 
-				// Format conversion buffers
 				ByteBuffer sourcebytes = ByteBuffer.allocate(offsets[i + 1].offset - imageoffset.offset);
 				bytechannel.read(sourcebytes);
+
+				// Format conversion buffers
+				sourcebytes.order(ByteOrder.LITTLE_ENDIAN);
 				sourcebytes.rewind();
 				
 				ByteBuffer destbytes = ByteBuffer.allocate(width() * height());
@@ -121,14 +210,14 @@ public class ShpFileCnc extends ShpFile<ShpFileHeaderCnc> implements AnimationFi
 				// Add the decompressed image to the image array
 				shpimages[i] = destbytes;
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally {
 			try {
 				bytechannel.close();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

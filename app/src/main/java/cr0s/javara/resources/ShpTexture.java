@@ -30,15 +30,15 @@ public class ShpTexture {
     public Color forcedColor;
 
     public ShpTexture(ShpFileCnc shp) {
-	this.width = shp.width();
-	this.height = shp.height();
-	this.numImages = shp.numImages();
+		this.width = shp.width();
+		this.height = shp.height();
+		this.numImages = shp.numImages();
 
-	for (int i = 0; i < remapIndexes.length; i++) {
-	    isRemap[remapIndexes[i]] = true;
-	}
+		for (int i = 0; i < remapIndexes.length; i++) {
+		    isRemap[remapIndexes[i]] = true;
+		}
 
-	this.shp = shp;
+		this.shp = shp;
     }
 
     /**

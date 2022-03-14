@@ -16,11 +16,15 @@
 
 package redhorizon.filetypes.mix;
 
+import android.content.res.AssetManager;
+
 import redhorizon.filetypes.ArchiveFile;
 import redhorizon.filetypes.FileExtensions;
 import redhorizon.filetypes.AbstractFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -46,11 +50,106 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 	private static final float ENCRYPT_BLOCK_SIZEF = 8f;
 
 	private final FileChannel filechannel;
+	private InputStream inputStream;
 
 	private boolean checksum;
 	private boolean encrypted;
 	private MixFileHeader mixheader;
 	private MixRecord[] mixrecords;
+
+	public MixFile(String filename, InputStream inputStream)
+	{
+		super(filename);
+
+		this.filechannel = null;
+		this.inputStream = inputStream;
+
+		byte[] flagBuffer = new	byte[FLAG_SIZE];
+		try {
+			ByteBuffer byteBuffer = ByteBuffer.wrap(flagBuffer);
+			byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+			flagBuffer = byteBuffer.array();
+			inputStream.read(flagBuffer);
+
+			int flag = ByteBuffer.wrap(flagBuffer).getInt();
+			checksum  = (flag & FLAG_CHECKSUM)  != 0;
+			encrypted = (flag & FLAG_ENCRYPTED) != 0;
+
+			// If encrypted, decrypt the mixheader and index
+			if (encrypted) {
+	/*
+				// Perform the public -> private/Blowfish key function
+				ByteBuffer keysource = ByteBuffer.allocate(KEY_SIZE_SOURCE);
+				filechannel.read(keysource);
+				ByteBuffer key = ByteBuffer.allocate(KEY_SIZE_BLOWFISH);
+				MixFileKey.getBlowfishKey(keysource, key);
+				//BlowfishECB blowfish = new BlowfishECB();
+				//blowfish.initialize(key.array(), 0, key.capacity());
+
+				// Decrypt the mixheader
+				ByteBuffer headerbytesenc = ByteBuffer.allocate(ENCRYPT_BLOCK_SIZEI);
+				ByteBuffer headerbytesdec = ByteBuffer.allocate(ENCRYPT_BLOCK_SIZEI);
+				filechannel.read(headerbytesenc);
+				blowfish.decrypt(headerbytesenc.array(), 0, headerbytesdec.array(), 0, headerbytesdec.capacity());
+				mixheader = new MixFileHeader(headerbytesdec);
+
+				// Now figure-out how many more on 8-byte blocks (+2) to decrypt
+				int numblocks = (int)Math.ceil((MixRecord.RECORD_SIZE * numFiles()) / ENCRYPT_BLOCK_SIZEF);
+				int numbytes = numblocks * 8;
+
+				ByteBuffer encryptedbytes = ByteBuffer.allocate(numbytes);
+				ByteBuffer decryptedbytes = ByteBuffer.allocate(numbytes);
+				filechannel.read(encryptedbytes);
+				blowfish.decrypt(encryptedbytes.array(), 0, decryptedbytes.array(), 0, decryptedbytes.capacity());
+
+				ByteBuffer recordsbytes = ByteBuffer.allocate(numbytes + 2);
+				recordsbytes.put(headerbytesdec).put(decryptedbytes).rewind();
+
+				// Take all the decrypted data and turn them into the index records
+				mixrecords = new MixRecord[numFiles()];
+				for (int i = 0; i < mixrecords.length; i++) {
+					mixrecords[i] = new MixRecord(recordsbytes);
+				}*/
+			}
+			// If not encrypted, just read the straight data
+			else {
+				//System.out.println("Non-encrypted mix");
+				// Read the mixheader
+				inputStream.mark(4);
+				inputStream.reset();
+				//stream.skip(4);
+
+				byte[] headerBuffer = new byte[MixFileHeader.HEADER_SIZE];
+				inputStream.read(headerBuffer);
+
+				ByteBuffer headerbytes = ByteBuffer.wrap(headerBuffer);
+				headerbytes.order(ByteOrder.LITTLE_ENDIAN);
+				headerbytes.rewind();
+
+				mixheader = new MixFileHeader(headerbytes);
+
+				// Now figure-out how much more of the file is the index
+				int numblocks = MixRecord.RECORD_SIZE * numFiles();
+				int numbytes = numblocks * 8;
+
+				byte[] recordsBuffer = new byte[numbytes];
+				inputStream.read(recordsBuffer);
+
+				ByteBuffer recordsbytes = ByteBuffer.wrap(recordsBuffer);
+				recordsbytes.order(ByteOrder.LITTLE_ENDIAN);
+				recordsbytes.rewind();
+
+				// Take all the data and turn it into the index records
+				mixrecords = new MixRecord[numFiles()];
+				for (int i = 0; i < mixrecords.length; i++) {
+					mixrecords[i] = new MixRecord(recordsbytes);
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Constructor, creates a mix file from a proper file on the file system.
@@ -184,9 +283,8 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReadableByteChannel getEntryData(MixRecord record) {
-
-		return new MixRecordByteChannel(filechannel, (int)record.offset + offsetAdjustSize(), (int)record.length);
+	public MixRecordByteChannel getEntryData(MixRecord record) {
+		return new MixRecordByteChannel(inputStream, (int)record.offset + offsetAdjustSize(), (int)record.length);
 	}
 
 	/**

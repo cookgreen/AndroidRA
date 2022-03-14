@@ -62,9 +62,8 @@ public class Main extends StateBasedGame {
     	gameStates = new ArrayList<>();
     }
 
-	public void Init(Context appContext, AndroidInput androidInput){
+	public void Init(Context appContext){
     	this.appContext = appContext;
-		this.androidInput = androidInput;
 
     	ResourceManager.getInstance().Init(appContext.getAssets());
 	}
@@ -79,25 +78,25 @@ public class Main extends StateBasedGame {
 
     @Override
     public void initStatesList(GameContainer arg0) throws SlickException {
-	  StateMainMenu mainMenuState = new StateMainMenu();
-	  StateGameMap gameMapState = new StateGameMap(arg0);
-	  StatePauseMenu pauseMenuState = new StatePauseMenu();
-	  StateLoadingScreen loadingScreenState = new StateLoadingScreen();
-	  StateTestScreen testScreenSatte = new StateTestScreen();
+	  StateMainMenu stateMainMenu = new StateMainMenu();
+	  StateGameMap stateGameMap = new StateGameMap(arg0);
+	  StatePauseMenu statePauseMenu = new StatePauseMenu();
+	  StateLoadingScreen stateLoadingScreen = new StateLoadingScreen();
+	  StateTestScreen stateTestScreen = new StateTestScreen();
 
-	  this.addState(mainMenuState);
-	  this.addState(gameMapState);
-	  this.addState(pauseMenuState);
-	  this.addState(loadingScreenState);
-	  this.addState(testScreenSatte);
+	  this.addState(stateMainMenu);
+	  this.addState(stateGameMap);
+	  this.addState(statePauseMenu);
+	  this.addState(stateLoadingScreen);
+	  this.addState(stateTestScreen);
 
-	  gameStates.add(mainMenuState);
-	  gameStates.add(gameMapState);
-	  gameStates.add(pauseMenuState);
-	  gameStates.add(loadingScreenState);
-	  gameStates.add(testScreenSatte);
+	  gameStates.add(stateMainMenu);
+	  gameStates.add(stateGameMap);
+	  gameStates.add(statePauseMenu);
+	  gameStates.add(stateLoadingScreen);
+	  gameStates.add(stateTestScreen);
 
-	  androidInput.setInputProcessor(mainMenuState);
+	  androidInput.setInputProcessor(stateMainMenu);
 
 	  // Disable native cursor
 	  //Cursor emptyCursor;
@@ -124,6 +123,11 @@ public class Main extends StateBasedGame {
     public void setWorld(World w) {
 	this.w = w;
     }
+
+    public void setAndroidInput(AndroidInput androidInput)
+	{
+		this.androidInput = androidInput;
+	}
 
     public void startNewGame(String mapName) {
 		rm = ResourceManager.getInstance();

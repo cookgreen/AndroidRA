@@ -24,6 +24,7 @@ import redhorizon.utilities.channels.ReadableByteChannelAdapter;
 import static redhorizon.filetypes.ColourFormat.FORMAT_RGB;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
@@ -40,6 +41,30 @@ public class PalFile extends AbstractFile implements PaletteFile {
 	private static final int PALETTE_SIZE = 256;
 
 	private ByteBuffer palettedata;
+
+	public PalFile(String name, InputStream inputStream)
+	{
+		super(name);
+
+		byte[] palBuffer = new byte[PALETTE_SIZE * 3];
+
+		try {
+			inputStream.read(palBuffer);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		palettedata = ByteBuffer.wrap(palBuffer);
+		palettedata.rewind();
+
+		// NOTE: VGA palettes used only 6 bits per byte, meaning they had to be multiplied
+		//       by 4 to reach the colour value they represent
+		for (int i = 0; i < (PALETTE_SIZE * 3); i++) {
+			byte b = (byte)(palettedata.get(i) << 2);
+			palettedata.put(i, b);
+		}
+	}
 
 	/**
 	 * Constructor, creates a new palette file using the given name and data.

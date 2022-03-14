@@ -13,10 +13,8 @@ public class GameActivity extends SlickActivity {
         super.onCreate(savedInstanceState);
 
         Main mainGame = Main.getInstance();
+        mainGame.Init(getApplicationContext());
         start(mainGame);
-        mainGame.Init(
-                getApplicationContext(),
-                input
-        );
+        mainGame.setAndroidInput(input);
     }
 }

@@ -3,6 +3,7 @@ package cr0s.javara.resources;
 import android.content.res.AssetManager;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ import cr0s.javara.gameplay.Team.Alignment;
 import redhorizon.filetypes.aud.AudFile;
 import redhorizon.filetypes.mix.MixFile;
 import redhorizon.filetypes.mix.MixRecord;
+import redhorizon.filetypes.mix.MixRecordByteChannel;
 import redhorizon.filetypes.pal.PalFile;
 import redhorizon.filetypes.shp.ShpFile;
 import redhorizon.filetypes.shp.ShpFileCnc;
@@ -71,26 +73,27 @@ public class ResourceManager {
     private SpriteSheet bib1, bib2, bib3;
 
     private ResourceManager() {
-	loadMixes();
     }
 
     public static ResourceManager getInstance() {
-	if (instance == null) {
-	    instance = new ResourceManager();
-	}
+		if (instance == null) {
+		    instance = new ResourceManager();
+		}
 
-	return instance;
+		return instance;
     }
 
     public void Init(AssetManager assetManager)
 	{
 		this.assetManager = assetManager;
+		loadMixes();
+		loadPals();
 	}
 
     public void loadBibs() {
-	bib1 = new SpriteSheet(getTemplateShpTexture("temperat", "bib1.tem").getAsCombinedImage(null), 24, 24);
-	bib2 = new SpriteSheet(getTemplateShpTexture("temperat", "bib2.tem").getAsCombinedImage(null), 24, 24);
-	bib3 = new SpriteSheet(getTemplateShpTexture("temperat", "bib3.tem").getAsCombinedImage(null), 24, 24);
+		bib1 = new SpriteSheet(getTemplateShpTexture("temperat", "bib1.tem").getAsCombinedImage(null), 24, 24);
+		bib2 = new SpriteSheet(getTemplateShpTexture("temperat", "bib2.tem").getAsCombinedImage(null), 24, 24);
+		bib3 = new SpriteSheet(getTemplateShpTexture("temperat", "bib3.tem").getAsCombinedImage(null), 24, 24);
     }
 
     public InputStream OpenFile(String path) throws IOException {
@@ -118,294 +121,307 @@ public class ResourceManager {
 	}
 
     public SpriteSheet getBibSheet(BibType bt) {
-	switch (bt) {
-	case SMALL:
-	    return bib3;
-	case MIDDLE:
-	    return bib2;
+		switch (bt) {
+		case SMALL:
+		    return bib3;
+		case MIDDLE:
+		    return bib2;
 
-	case BIG:
-	    return bib1;
+		case BIG:
+		    return bib1;
 
-	default:
-	    return null;
-	}
+		default:
+		    return null;
+		}
     }
 
     private void loadMixes() {
-	RandomAccessFile randomAccessFile = null;
-
-	try {
-	    List<Path> mixFiles = listDirectoryMixes(Paths.get(RESOURCE_FOLDER));
-
-	    for (Path f : mixFiles) {
-		randomAccessFile = new RandomAccessFile(f.toString(), "r");
-		FileChannel inChannel = randomAccessFile.getChannel();
-
-		MixFile mix = new MixFile(f.getFileName().toString(), inChannel);
-
-		mixes.put(mix.getFileName(), mix);
-	    }
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} finally {
-	}
+		try {
+			String[] contents = assetManager.list("resources");
+			for (String content : contents)
+			{
+				if(content.endsWith(".mix")) {
+					InputStream mixFileStream = assetManager.open("resources" + File.separator + content);
+					MixFile mixFile = new MixFile(content, mixFileStream);
+					mixes.put(mixFile.getFileName(), mixFile);
+				}
+			}
+		} catch (IOException e) {
+		    e.printStackTrace();
+		} finally {
+		}
     }
 
+    private void  loadPals(){
+		try{
+			String path = "resources" + File.separator + "pal";
+			String[] contents = assetManager.list(path);
+			for (String content : contents)
+			{
+				if(content.endsWith(".pal")){
+					InputStream palStream = OpenResourcesPalFile(content);
+					PalFile palFile = new PalFile(content, palStream);
+					palettes.put(palFile.getFileName(), palFile);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally {
+		}
+	}
+
     public ShpTexture getSidebarTexture(String name) {
-	MixFile mix = mixes.get("interface.mix");
+		MixFile mix = mixes.get("interface.mix");
 
-	// Check texture sources cache
-	if (commonTextureSources.containsKey(name)) {
-	    return commonTextureSources.get(name);
-	}
+		// Check texture sources cache
+		if (commonTextureSources.containsKey(name)) {
+		    return commonTextureSources.get(name);
+		}
 
-	if (mix != null) {
-	    MixRecord rec = mix.getEntry(name);
+		if (mix != null) {
+		    MixRecord rec = mix.getEntry(name);
 
-	    if (rec != null) {
-		ReadableByteChannel rbc = mix.getEntryData(rec);
+		    if (rec != null) {
+				MixRecordByteChannel rbc = mix.getEntryData(rec);
 
-		ShpFileCnc shp = new ShpFileCnc(name, rbc);
-		ShpTexture shpTexture = new ShpTexture(shp);
-		commonTextureSources.put(name, shpTexture);
-		return shpTexture;
-	    } else {
+				ShpFileCnc shp = new ShpFileCnc(name, rbc);
+				ShpTexture shpTexture = new ShpTexture(shp);
+				commonTextureSources.put(name, shpTexture);
+				return shpTexture;
+		    } else {
+				return null;
+		    }
+		}
+
 		return null;
-	    }
-	}
-
-	return null;
     }    
 
     public ShpTexture getConquerTexture(String name) {
-	MixFile mix = mixes.get("conquer.mix");
+		MixFile mix = mixes.get("conquer.mix");
 
-	// Check texture sources cache
-	if (commonTextureSources.containsKey(name)) {
-	    return commonTextureSources.get(name);
-	}
+		// Check texture sources cache
+		if (commonTextureSources.containsKey(name)) {
+		    return commonTextureSources.get(name);
+		}
 
-	if (mix != null) {
-	    MixRecord rec = mix.getEntry(name);
+		if (mix != null) {
+		    MixRecord rec = mix.getEntry(name);
 
-	    if (rec != null) {
-		ReadableByteChannel rbc = mix.getEntryData(rec);
+		    if (rec != null) {
+				MixRecordByteChannel rbc = mix.getEntryData(rec);
 
-		ShpFileCnc shp = new ShpFileCnc(name, rbc);
-		ShpTexture shpTexture = new ShpTexture(shp);
-		shpTexture.palleteName = "temperat.pal";
-		commonTextureSources.put(name, shpTexture);
-		return shpTexture;
-	    } else {
+				ShpFileCnc shp = new ShpFileCnc(name, rbc);
+				ShpTexture shpTexture = new ShpTexture(shp);
+				shpTexture.palleteName = "temperat.pal";
+				commonTextureSources.put(name, shpTexture);
+				return shpTexture;
+		    } else {
+				return null;
+		    }
+		}
+
 		return null;
-	    }
-	}
-
-	return null;
     }
 
     public XSound loadSpeechSound(String name) {
-	return loadSound("speech.mix", name + ".aud");
+		return loadSound("speech.mix", name + ".aud");
     }
 
-    public XSound loadSound(String mixname, String name) {
-	MixFile mix = mixes.get(mixname);
+    	public XSound loadSound(String mixname, String name) {
+		MixFile mix = mixes.get(mixname);
 
-	// Check texture sources cache
-	if (this.sounds.containsKey(name)) {
-	    return sounds.get(name);
-	}
-
-	if (mix != null) {
-	    MixRecord rec = mix.getEntry(name);
-
-	    if (rec != null) {
-		ReadableByteChannel rbc = mix.getEntryData(rec);
-		AudFile aud = new AudFile(name, rbc);
-
-		XSound sound = null;
-		try {
-		    sound = new XSound(name, new BufferedInputStream(Channels.newInputStream(aud.getSoundData())));
-		} catch (SlickException e) {
-		    e.printStackTrace();
-		}
-		//aud.close();
-
-		if (sound != null) {
-		    this.sounds.put(name, sound);
+		// Check texture sources cache
+		if (this.sounds.containsKey(name)) {
+		    return sounds.get(name);
 		}
 
-		return sound;
-	    } else {
+		if (mix != null) {
+		    MixRecord rec = mix.getEntry(name);
+
+		    if (rec != null) {
+			ReadableByteChannel rbc = mix.getEntryData(rec);
+			AudFile aud = new AudFile(name, rbc);
+
+			XSound sound = null;
+			try {
+			    sound = new XSound(name, new BufferedInputStream(Channels.newInputStream(aud.getSoundData())));
+			} catch (SlickException e) {
+			    e.printStackTrace();
+			}
+			//aud.close();
+
+			if (sound != null) {
+			    this.sounds.put(name, sound);
+			}
+
+			return sound;
+		    } else {
+			return null;
+		    }
+		}
+
 		return null;
-	    }
-	}
-
-	return null;	
     }
 
     public ShpTexture getTemplateShpTexture(String tileSetName, String name) {
-	MixFile mix = mixes.get(tileSetName.toLowerCase() + ".mix");
+		MixFile mix = mixes.get(tileSetName.toLowerCase() + ".mix");
 
-	// Check texture sources cache
-	if (shpTextureSources.containsKey(name)) {
-	    return shpTextureSources.get(name);
-	}
+		// Check texture sources cache
+		if (shpTextureSources.containsKey(name)) {
+		    return shpTextureSources.get(name);
+		}
 
-	if (mix != null) {
-	    MixRecord rec = mix.getEntry(name);
+		if (mix != null) {
+		    MixRecord rec = mix.getEntry(name);
 
-	    if (rec != null) {
-		ReadableByteChannel rbc = mix.getEntryData(rec);
+		    if (rec != null) {
+				MixRecordByteChannel rbc = mix.getEntryData(rec);
 
-		ShpFileCnc shp = new ShpFileCnc(name, rbc);
-		ShpTexture shpTexture = new ShpTexture(shp);
-		shpTexture.palleteName = tileSetName + ".pal";
-		shpTextureSources.put(name, shpTexture);
+				ShpFileCnc shp = new ShpFileCnc(name, rbc);
+				ShpTexture shpTexture = new ShpTexture(shp);
+				shpTexture.palleteName = tileSetName + ".pal";
+				shpTextureSources.put(name, shpTexture);
 
-		return shpTexture;
-	    } else {
-		System.err.println("Record SHP (" + name +") in " + tileSetName + ".mix is not found");
+				return shpTexture;
+		    } else {
+				System.err.println("Record SHP (" + name +") in " + tileSetName + ".mix is not found");
+				return null;
+		    }
+		} else {
+		    System.err.println("Mix file " + tileSetName + ".mix is not found");
+		}
+
 		return null;
-	    }
-	} else {
-	    System.err.println("Mix file " + tileSetName + ".mix is not found");    
-	}
-
-	return null;
     }    
 
     public TmpTexture getTemplateTexture(String type, String name) {
-	type = type.toLowerCase();
-	MixFile mix = mixes.get(type + ".mix");
+		type = type.toLowerCase();
+		MixFile mix = mixes.get(type + ".mix");
 
-	// Check texture sources cache
-	if (templatesTexureSources.containsKey(name)) {
-	    return templatesTexureSources.get(name);
-	}
+		// Check texture sources cache
+		if (templatesTexureSources.containsKey(name)) {
+		    return templatesTexureSources.get(name);
+		}
 
-	if (mix != null) {
-	    MixRecord rec = mix.getEntry(name);
+		if (mix != null) {
+		    MixRecord rec = mix.getEntry(name);
 
-	    if (rec != null) {
-		ReadableByteChannel rbc = mix.getEntryData(rec);
+		    if (rec != null) {
+			ReadableByteChannel rbc = mix.getEntryData(rec);
 
-		TmpFileRA tmp = new TmpFileRA(name, rbc);
-		TmpTexture tmpTexture = new TmpTexture(tmp, type);
+			TmpFileRA tmp = new TmpFileRA(name, rbc);
+			TmpTexture tmpTexture = new TmpTexture(tmp, type);
 
-		templatesTexureSources.put(name, tmpTexture);
-		return tmpTexture;
-	    } else {
-		//System.out.println("Record (" + name +") in " + type + ".mix is not found");
+			templatesTexureSources.put(name, tmpTexture);
+			return tmpTexture;
+		    } else {
+			//System.out.println("Record (" + name +") in " + type + ".mix is not found");
+			return null;
+		    }
+		}
+
+		System.out.println(type + ".mix is not found");
 		return null;
-	    }
-	}
-
-	System.out.println(type + ".mix is not found");
-	return null;
     }    
 
     public PalFile getPaletteByName(String name) {
-	if (palettes.containsKey(name)) {
-	    return palettes.get(name);
-	}
+		if (palettes.containsKey(name)) {
+		    return palettes.get(name);
+		}
 
-	try (RandomAccessFile randomAccessFile = new RandomAccessFile(PAL_FOLDER + name.toString().toLowerCase(), "r")) {
-	    FileChannel inChannel = randomAccessFile.getChannel();
-	    PalFile palfile = new PalFile(name, inChannel);
+		try (RandomAccessFile randomAccessFile = new RandomAccessFile(PAL_FOLDER + name.toString().toLowerCase(), "r")) {
+		    FileChannel inChannel = randomAccessFile.getChannel();
+		    PalFile palfile = new PalFile(name, inChannel);
 
-	    palettes.put(name, palfile);
+		    palettes.put(name, palfile);
 
-	    return palfile;
-	} catch (IOException e) {
-	    e.printStackTrace();
-	} finally {
-	}
+		    return palfile;
+		} catch (IOException e) {
+		    e.printStackTrace();
+		} finally {
+		}
 
-	return null;
+		return null;
     }
 
     List<Path> listDirectoryMixes(Path resourceFolder) throws IOException {
-	List<Path> result = new ArrayList<>();
-	try (DirectoryStream<Path> stream = Files.newDirectoryStream(
-		resourceFolder, "*.{mix}")) {
-	    for (Path entry : stream) {
-		result.add(entry);
-	    }
-	} catch (DirectoryIteratorException ex) {
-	    throw ex.getCause();
-	}
+		List<Path> result = new ArrayList<>();
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(
+			resourceFolder, "*.{mix}")) {
+		    for (Path entry : stream) {
+			result.add(entry);
+		    }
+		} catch (DirectoryIteratorException ex) {
+		    throw ex.getCause();
+		}
 
-	return result;
-    }
+		return result;
+    	}
 
-    public XSound loadUnitSound(Alignment alignment, String name) {
-	String mixname = "allies.mix";
-	if (alignment == Alignment.SOVIET) {
-	    mixname = "russian.mix";
-	}
+    	public XSound loadUnitSound(Alignment alignment, String name) {
+		String mixname = "allies.mix";
+		if (alignment == Alignment.SOVIET) {
+		    mixname = "russian.mix";
+		}
 
-	return loadSound(mixname, name);
+		return loadSound(mixname, name);
     }
 
     public ShpTexture getInfantryTexture(String name) {
-	MixFile mix = mixes.get("hires.mix");
+		MixFile mix = mixes.get("hires.mix");
 
-	// Check texture sources cache
-	if (commonTextureSources.containsKey(name)) {
-	    return commonTextureSources.get(name);
-	}
+		// Check texture sources cache
+		if (commonTextureSources.containsKey(name)) {
+		    return commonTextureSources.get(name);
+		}
 
-	if (mix != null) {
-	    MixRecord rec = mix.getEntry(name);
+		if (mix != null) {
+		    MixRecord rec = mix.getEntry(name);
 
-	    if (rec != null) {
-		ReadableByteChannel rbc = mix.getEntryData(rec);
+		    if (rec != null) {
+				MixRecordByteChannel rbc = mix.getEntryData(rec);
 
-		ShpFileCnc shp = new ShpFileCnc(name, rbc);
-		ShpTexture shpTexture = new ShpTexture(shp);
-		commonTextureSources.put(name, shpTexture);
-		return shpTexture;
-	    } else {
-		System.out.println("HIRES: " + name + " not found");
+				ShpFileCnc shp = new ShpFileCnc(name, rbc);
+				ShpTexture shpTexture = new ShpTexture(shp);
+				commonTextureSources.put(name, shpTexture);
+				return shpTexture;
+		    	} else {
+				System.out.println("HIRES: " + name + " not found");
+				return null;
+		    }
+		}
+
 		return null;
-	    }
-	}
-
-	return null;
     }
 
     public ShpTexture getShpTexture(String name) {
 	// Check texture sources cache
-	if (commonTextureSources.containsKey(name)) {
-	    return commonTextureSources.get(name);
-	}
+		if (commonTextureSources.containsKey(name)) {
+	    	return commonTextureSources.get(name);
+		}
 
-	RandomAccessFile randomAccessFile = null;
-	
-	try {
-	    randomAccessFile = new RandomAccessFile(RESOURCE_FOLDER + name.toLowerCase(), "r");
-	    
-	    FileChannel inChannel = randomAccessFile.getChannel();
-	    
-	    ShpFileCnc shp = new ShpFileCnc(name, inChannel);
-	    ShpTexture shpTexture = new ShpTexture(shp);
-	    shpTexture.palleteName = "temperat.pal";
-	    
-	    commonTextureSources.put(name, shpTexture);
-	    return shpTexture;
-	} catch (IOException e) {
-	    e.printStackTrace();
-	    return null;
-	} finally {
-	    if (randomAccessFile != null) {
+		RandomAccessFile randomAccessFile = null;
+
 		try {
-		    randomAccessFile.close();
+			InputStream inputStream = OpenResourcesFile(name);
+
+		    ShpFileCnc shp = new ShpFileCnc(name, inputStream);
+		    ShpTexture shpTexture = new ShpTexture(shp);
+		    shpTexture.palleteName = "temperat.pal";
+
+		    commonTextureSources.put(name, shpTexture);
+		    return shpTexture;
 		} catch (IOException e) {
 		    e.printStackTrace();
+		    return null;
+		} finally {
+		    if (randomAccessFile != null) {
+				try {
+				    randomAccessFile.close();
+				} catch (IOException e) {
+				    e.printStackTrace();
+				}
+		    }
 		}
-	    }
-	}
     }
 }

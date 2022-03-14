@@ -19,6 +19,7 @@ package redhorizon.filetypes.mix;
 import redhorizon.utilities.channels.AbstractDuplicateReadOnlyByteChannel;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -31,6 +32,7 @@ import java.nio.channels.FileChannel;
 public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 
 	private final FileChannel filechannel;
+	private InputStream inputStream;
 	private final long lowerbound;
 	private final long upperbound;
 
@@ -38,6 +40,23 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 	 * Constructor, creates a byte channel backed by the mix file's file
 	 * channel.
 	 * 
+	 * @param inputStream
+	 * @param lowerbound
+	 * @param size
+	 */
+	MixRecordByteChannel(InputStream inputStream, int lowerbound, int size) {
+		this.filechannel = null;
+		this.inputStream = inputStream;
+		this.lowerbound  = lowerbound;
+		this.upperbound  = lowerbound + size;
+
+		position = lowerbound;
+	}
+
+	/**
+	 * Constructor, creates a byte channel backed by the mix file's file
+	 * channel.
+	 *
 	 * @param filechannel
 	 * @param lowerbound
 	 * @param size
@@ -60,13 +79,43 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 		return filechannel.isOpen();
 	}
 
+	public int readBytes(byte[] bytes)
+	{
+		ByteBuffer dst = ByteBuffer.wrap(bytes);
+		dst.order(ByteOrder.LITTLE_ENDIAN);
+
+		int remaining = (int)(upperbound - position);
+		if (remaining == 0) {
+			return -1;
+		}
+
+		int oldlimit = dst.limit();
+		dst.limit(dst.position() + Math.min(dst.remaining(), remaining));
+
+		int readCount = 0;
+		try {
+			inputStream.mark((int)position);
+			inputStream.reset();
+
+			bytes = dst.array();
+
+			readCount = inputStream.read(bytes);
+			position += readCount;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return readCount;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public int read(ByteBuffer dst) {
 		dst.order(ByteOrder.LITTLE_ENDIAN);
-		
+
 		int remaining = (int)(upperbound - position);
 		if (remaining == 0) {
 		return -1;
@@ -75,8 +124,14 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 		dst.limit(dst.position() + Math.min(dst.remaining(), remaining));
 		int read = 0;
 		try {
-			read = filechannel.read(dst, position);
+			inputStream.mark((int)position);
+			inputStream.reset();
+
+			byte[] bytes = dst.array();
+			read = inputStream.read(bytes);
 			position += read;
+
+			dst = ByteBuffer.wrap(bytes);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
