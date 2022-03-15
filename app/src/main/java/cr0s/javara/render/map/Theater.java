@@ -229,9 +229,9 @@ public class Theater {
 
 	    // Copy texture into sheet
 	    try {
-		sheet.getGraphics().drawImage(img, deployX, deployY);
+			sheet.getGraphics().drawImage(img, deployX, deployY);
 	    } catch (SlickException e) {
-		e.printStackTrace();
+			e.printStackTrace();
 	    }    
 	}
 

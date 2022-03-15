@@ -131,7 +131,7 @@ public class Main extends StateBasedGame {
 
     public void startNewGame(String mapName) {
 		rm = ResourceManager.getInstance();
-		rm.loadBibs();
+		//rm.loadBibs();
 
 		camera = new Camera();
 		try {

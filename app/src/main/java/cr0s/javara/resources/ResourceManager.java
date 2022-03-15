@@ -275,20 +275,20 @@ public class ResourceManager {
 		    MixRecord rec = mix.getEntry(name);
 
 		    if (rec != null) {
-				MixRecordByteChannel rbc = mix.getEntryData(rec);
+				MixRecordByteChannel bytes = mix.getEntryData(rec);
 
-				ShpFileCnc shp = new ShpFileCnc(name, rbc);
+				ShpFileCnc shp = new ShpFileCnc(name, bytes);
 				ShpTexture shpTexture = new ShpTexture(shp);
 				shpTexture.palleteName = tileSetName + ".pal";
 				shpTextureSources.put(name, shpTexture);
 
 				return shpTexture;
 		    } else {
-				System.err.println("Record SHP (" + name +") in " + tileSetName + ".mix is not found");
+				System.err.println("Record SHP (" + name +") in " + tileSetName.toLowerCase() + ".mix is not found");
 				return null;
 		    }
 		} else {
-		    System.err.println("Mix file " + tileSetName + ".mix is not found");
+		    System.err.println("Mix file " + tileSetName.toLowerCase() + ".mix is not found");
 		}
 
 		return null;
@@ -307,7 +307,7 @@ public class ResourceManager {
 		    MixRecord rec = mix.getEntry(name);
 
 		    if (rec != null) {
-			ReadableByteChannel rbc = mix.getEntryData(rec);
+			MixRecordByteChannel rbc = mix.getEntryData(rec);
 
 			TmpFileRA tmp = new TmpFileRA(name, rbc);
 			TmpTexture tmpTexture = new TmpTexture(tmp, type);

@@ -3,6 +3,7 @@ package cr0s.javara.render.map;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,7 +61,8 @@ public class TileSet {
 
 	InputStream input;
 	try {
-	    input = new FileInputStream(new File(ResourceManager.TILESETS_FOLDER + (aSetName + ".yaml").toLowerCase()));
+	    //input = new FileInputStream(new File(ResourceManager.TILESETS_FOLDER + (aSetName + ".yaml").toLowerCase()));
+		input = ResourceManager.getInstance().OpenTilesetsFile((aSetName + ".yaml").toLowerCase());
 
 	    System.out.println("Loaded tileSet: " + ResourceManager.TILESETS_FOLDER + (aSetName + ".yaml").toLowerCase());
 	    Yaml tilesetYaml = new Yaml();
@@ -114,8 +116,10 @@ public class TileSet {
 	    }
 	} catch (FileNotFoundException e) {
 	    e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
 	}
-    }
+	}
 
     public String getSetName() {
 	return this.setName;

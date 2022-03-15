@@ -24,6 +24,7 @@ import redhorizon.filetypes.SoundBitrate;
 import redhorizon.filetypes.SoundChannels;
 import redhorizon.filetypes.StreamingDataDecoder;
 import redhorizon.filetypes.VideoFile;
+import redhorizon.filetypes.mix.MixRecordByteChannel;
 import redhorizon.utilities.BufferUtility;
 import redhorizon.utilities.CodecUtility;
 import redhorizon.utilities.ImageUtility;
@@ -75,7 +76,7 @@ public class VqaFile extends AbstractFile implements VideoFile {
 	 * @param name		  The name of this file.
 	 * @param bytechannel The data of this file.
 	 */
-	public VqaFile(String name, ReadableByteChannel bytechannel) {
+	public VqaFile(String name, MixRecordByteChannel bytechannel) {
 
 		super(name);
 

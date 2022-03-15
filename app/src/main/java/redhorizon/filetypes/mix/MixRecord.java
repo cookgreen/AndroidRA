@@ -16,6 +16,8 @@
 
 package redhorizon.filetypes.mix;
 
+import com.android.redalert.Utils;
+
 import java.nio.ByteBuffer;
 
 import redhorizon.filetypes.ArchiveFileEntry;
@@ -35,6 +37,9 @@ public class MixRecord implements ArchiveFileEntry, Comparable<MixRecord> {
 	final long offset;
 	final long length;
 
+	public byte[] recordBytes;
+
+
 	/**
 	 * Constructor, assigns the ID, offset, and length of this entry from the
 	 * current byte channel.
@@ -45,6 +50,14 @@ public class MixRecord implements ArchiveFileEntry, Comparable<MixRecord> {
 		id     = bytes.getInt();
 		offset = bytes.getInt();
 		length = bytes.getInt();
+	}
+
+	MixRecord(byte[] recordData, int id, int offset, int length)
+	{
+		this.id = id;
+		this.offset = offset;
+		this.length = length;
+		recordBytes = recordData;
 	}
 	/**
 	 * Compares this record to the other, returns negative, zero, or positive if

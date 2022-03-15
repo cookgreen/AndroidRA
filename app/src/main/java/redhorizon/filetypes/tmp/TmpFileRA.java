@@ -21,6 +21,7 @@ import redhorizon.filetypes.FileExtensions;
 import redhorizon.filetypes.AbstractFile;
 import redhorizon.filetypes.ImagesFile;
 import redhorizon.filetypes.Paletted;
+import redhorizon.filetypes.mix.MixRecordByteChannel;
 import redhorizon.utilities.BufferUtility;
 import redhorizon.utilities.channels.ReadableByteChannelAdapter;
 import static redhorizon.filetypes.ColourFormat.FORMAT_RGBA;
@@ -48,7 +49,7 @@ public class TmpFileRA extends AbstractFile implements ImagesFile, Paletted {
 	 * @param name		  The name of this file.
 	 * @param bytechannel Data for this file.
 	 */
-	public TmpFileRA(String name, ReadableByteChannel bytechannel) {
+	public TmpFileRA(String name, MixRecordByteChannel bytechannel) {
 
 		super(name);
 		
@@ -122,7 +123,7 @@ public class TmpFileRA extends AbstractFile implements ImagesFile, Paletted {
 		} finally {
 		    try {
 			bytechannel.close();
-		    } catch (IOException e) {
+		    } catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		    }

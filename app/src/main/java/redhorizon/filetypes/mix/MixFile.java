@@ -18,6 +18,8 @@ package redhorizon.filetypes.mix;
 
 import android.content.res.AssetManager;
 
+import com.android.redalert.Utils;
+
 import redhorizon.filetypes.ArchiveFile;
 import redhorizon.filetypes.FileExtensions;
 import redhorizon.filetypes.AbstractFile;
@@ -66,10 +68,16 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 
 		byte[] flagBuffer = new	byte[FLAG_SIZE];
 		try {
+			byte[] fullDataBytes = new byte[inputStream.available()];
+			inputStream.read(fullDataBytes);
+
+			int pos = 0;
+
 			ByteBuffer byteBuffer = ByteBuffer.wrap(flagBuffer);
 			byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-			flagBuffer = byteBuffer.array();
-			inputStream.read(flagBuffer);
+			flagBuffer = Utils.grabBytes(fullDataBytes, 0, flagBuffer.length);
+
+			pos += flagBuffer.length;
 
 			int flag = ByteBuffer.wrap(flagBuffer).getInt();
 			checksum  = (flag & FLAG_CHECKSUM)  != 0;
@@ -120,7 +128,9 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 				//stream.skip(4);
 
 				byte[] headerBuffer = new byte[MixFileHeader.HEADER_SIZE];
-				inputStream.read(headerBuffer);
+				headerBuffer = Utils.grabBytes(fullDataBytes, pos, headerBuffer.length);
+
+				pos += headerBuffer.length;
 
 				ByteBuffer headerbytes = ByteBuffer.wrap(headerBuffer);
 				headerbytes.order(ByteOrder.LITTLE_ENDIAN);
@@ -133,8 +143,9 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 				int numbytes = numblocks * 8;
 
 				byte[] recordsBuffer = new byte[numbytes];
-				inputStream.read(recordsBuffer);
+				recordsBuffer = Utils.grabBytes(fullDataBytes, pos, numbytes);
 
+				//All Files Offset-Length Table
 				ByteBuffer recordsbytes = ByteBuffer.wrap(recordsBuffer);
 				recordsbytes.order(ByteOrder.LITTLE_ENDIAN);
 				recordsbytes.rewind();
@@ -142,7 +153,11 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 				// Take all the data and turn it into the index records
 				mixrecords = new MixRecord[numFiles()];
 				for (int i = 0; i < mixrecords.length; i++) {
-					mixrecords[i] = new MixRecord(recordsbytes);
+					int id = recordsbytes.getInt();
+					int offset = recordsbytes.getInt();
+					int length = recordsbytes.getInt();
+
+					mixrecords[i] = new MixRecord(fullDataBytes, id, offset, length);
 				}
 			}
 		} catch (IOException e) {
@@ -284,7 +299,7 @@ public class MixFile extends AbstractFile implements ArchiveFile<MixRecord> {
 	 */
 	@Override
 	public MixRecordByteChannel getEntryData(MixRecord record) {
-		return new MixRecordByteChannel(inputStream, (int)record.offset + offsetAdjustSize(), (int)record.length);
+		return new MixRecordByteChannel(record.recordBytes, (int)record.offset+offsetAdjustSize(),(int)record.length);
 	}
 
 	/**

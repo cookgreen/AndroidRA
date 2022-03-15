@@ -16,6 +16,9 @@
 
 package redhorizon.filetypes.mix;
 
+import com.android.redalert.BytesAccessReader;
+import com.android.redalert.Utils;
+
 import redhorizon.utilities.channels.AbstractDuplicateReadOnlyByteChannel;
 
 import java.io.IOException;
@@ -35,6 +38,9 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 	private InputStream inputStream;
 	private final long lowerbound;
 	private final long upperbound;
+	private int size;
+
+	private  byte[] bytes;
 
 	/**
 	 * Constructor, creates a byte channel backed by the mix file's file
@@ -47,10 +53,33 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 	MixRecordByteChannel(InputStream inputStream, int lowerbound, int size) {
 		this.filechannel = null;
 		this.inputStream = inputStream;
+
 		this.lowerbound  = lowerbound;
 		this.upperbound  = lowerbound + size;
 
+		this.size = size;
+
 		position = lowerbound;
+	}
+
+	MixRecordByteChannel(ByteBuffer originalBuffer, int lowerbound, int size){
+		this.filechannel = null;
+		this.lowerbound = lowerbound;
+		this.size = size;
+		this.upperbound = lowerbound + size;
+
+		bytes = originalBuffer.array();
+	}
+
+	MixRecordByteChannel(byte[] recordBytes, int lowerbound, int size)
+	{
+		this.filechannel = null;
+		this.lowerbound = lowerbound;
+		this.upperbound = lowerbound+size;
+		this.size = size;
+
+		bytes = recordBytes; //Android doesn't support Random File access, so we only use byte array
+		position = lowerbound; //Because we already byte array to access the data rather than MixFile's InputStream or FileChannel
 	}
 
 	/**
@@ -79,34 +108,22 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 		return filechannel.isOpen();
 	}
 
-	public int readBytes(byte[] bytes)
+	public ByteBuffer readBytes(ByteBuffer dst) throws ArrayIndexOutOfBoundsException
 	{
-		ByteBuffer dst = ByteBuffer.wrap(bytes);
 		dst.order(ByteOrder.LITTLE_ENDIAN);
 
 		int remaining = (int)(upperbound - position);
-		if (remaining == 0) {
-			return -1;
-		}
 
 		int oldlimit = dst.limit();
-		dst.limit(dst.position() + Math.min(dst.remaining(), remaining));
 
-		int readCount = 0;
-		try {
-			inputStream.mark((int)position);
-			inputStream.reset();
+		int read = 0;
+		byte[] bytes = dst.array();
+		bytes = Utils.grabBytes(this.bytes, (int)position, bytes.length);
+		position += read; //cursor move forward
+		dst = ByteBuffer.wrap(bytes);
 
-			bytes = dst.array();
-
-			readCount = inputStream.read(bytes);
-			position += readCount;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return readCount;
+		dst.limit(oldlimit);
+		return dst;
 	}
 
 	/**
@@ -114,30 +131,7 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 	 */
 	@Override
 	public int read(ByteBuffer dst) {
-		dst.order(ByteOrder.LITTLE_ENDIAN);
-
-		int remaining = (int)(upperbound - position);
-		if (remaining == 0) {
 		return -1;
-		}
-		int oldlimit = dst.limit();
-		dst.limit(dst.position() + Math.min(dst.remaining(), remaining));
-		int read = 0;
-		try {
-			inputStream.mark((int)position);
-			inputStream.reset();
-
-			byte[] bytes = dst.array();
-			read = inputStream.read(bytes);
-			position += read;
-
-			dst = ByteBuffer.wrap(bytes);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		dst.limit(oldlimit);
-		return read;
 	}
 
 	/**
@@ -147,5 +141,9 @@ public class MixRecordByteChannel extends AbstractDuplicateReadOnlyByteChannel {
 	public long size() {
 
 		return upperbound - lowerbound;
+	}
+
+	public ByteBuffer getRemainingBytes() {
+		return ByteBuffer.wrap(Utils.grabBytes(this.bytes, (int)position, (int)(this.bytes.length - position)));
 	}
 }

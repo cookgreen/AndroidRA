@@ -23,6 +23,7 @@ import redhorizon.filetypes.FileType;
 import redhorizon.filetypes.ImageFile;
 import redhorizon.filetypes.PalettedInternal;
 import redhorizon.filetypes.UnsupportedFileException;
+import redhorizon.filetypes.mix.MixRecordByteChannel;
 import redhorizon.media.Palette;
 import redhorizon.utilities.BufferUtility;
 import redhorizon.utilities.CodecUtility;
@@ -66,7 +67,7 @@ public class PcxFile extends AbstractFile implements ImageFile, PalettedInternal
 	 * @param name		  Name of the pcx file.
 	 * @param bytechannel Input stream of the pcx file data.
 	 */
-	public PcxFile(String name, ReadableByteChannel bytechannel) {
+	public PcxFile(String name, MixRecordByteChannel bytechannel) {
 
 		super(name);
 
@@ -105,11 +106,11 @@ public class PcxFile extends AbstractFile implements ImageFile, PalettedInternal
 			ByteBuffer palettebytes = ByteBuffer.allocate(PALETTE_SIZE);
 			palettebytes.put((ByteBuffer)pcxdata.position(pcxdata.position() + PALETTE_PADDING_SIZE));
 			pcxpalette = new PcxPalette(palettebytes);
-		} catch (IOException e) { e.printStackTrace(); }
+		} catch (Exception e) { e.printStackTrace(); }
 		finally {
 			try {
 				bytechannel.close();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

@@ -23,6 +23,7 @@ import redhorizon.filetypes.ImageFile;
 import redhorizon.filetypes.Paletted;
 import redhorizon.filetypes.PalettedInternal;
 import redhorizon.filetypes.WritableFile;
+import redhorizon.filetypes.mix.MixRecordByteChannel;
 import redhorizon.filetypes.pcx.PcxFile;
 import redhorizon.media.Palette;
 import redhorizon.utilities.BufferUtility;
@@ -66,7 +67,7 @@ public class CpsFile extends AbstractFile implements ImageFile, Paletted, Palett
 	 * @param name		  Name of the CPS file.
 	 * @param bytechannel Data of the cps file.
 	 */
-	public CpsFile(String name, ReadableByteChannel bytechannel) {
+	public CpsFile(String name, MixRecordByteChannel bytechannel) {
 
 		super(name);
 
@@ -91,11 +92,11 @@ public class CpsFile extends AbstractFile implements ImageFile, Paletted, Palett
 			imagebytes.rewind();
 			cpsimage = ByteBuffer.allocate(cpsheader.imagesize);
 			CodecUtility.decodeFormat80(imagebytes, cpsimage);
-		} catch (IOException e) {}
+		} catch (Exception e) {}
 		finally {
 			try {
 				bytechannel.close();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

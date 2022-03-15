@@ -25,20 +25,20 @@ public class ShroudRenderer {
     private World w;
 
     public ShroudRenderer(World aW) {
-	this.w = aW;
+		this.w = aW;
 
-	this.shroudMap = new ShroudTile[w.getMap().getWidth()][w.getMap().getHeight()];
-	for (int x = 0; x < w.getMap().getWidth(); x++) {
-	    for (int y = 0; y < w.getMap().getHeight(); y++) {
-		this.shroudMap[x][y] = new ShroudTile(x * 24, y * 24, 0);
-	    }
-	}	
+		this.shroudMap = new ShroudTile[w.getMap().getWidth()][w.getMap().getHeight()];
+		for (int x = 0; x < w.getMap().getWidth(); x++) {
+		    for (int y = 0; y < w.getMap().getHeight(); y++) {
+			this.shroudMap[x][y] = new ShroudTile(x * 24, y * 24, 0);
+		    }
+		}
 
-	this.shroudsSheet = new SpriteSheet(ResourceManager.getInstance().getConquerTexture("shadow.shp").getAsCombinedImage(null, true, 0, 0), 24, 24);
+		this.shroudsSheet = new SpriteSheet(ResourceManager.getInstance().getConquerTexture("shadow.shp").getAsCombinedImage(null, true, 0, 0), 24, 24);
 
-	spriteMap = new short[256];
-	for (short i = 0; i < index.length; i++)
-	    spriteMap[index[i]] = i;
+		spriteMap = new short[256];
+		for (short i = 0; i < index.length; i++)
+		    spriteMap[index[i]] = i;
 
     }
 

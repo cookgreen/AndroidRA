@@ -1,5 +1,7 @@
 package cr0s.javara.render.map;
 
+import com.android.redalert.Utils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -66,56 +68,60 @@ public class TileMap {
 
 	InputStream input;
 	try {
-	    input = new FileInputStream(new File(ResourceManager.MAPS_FOLDER + (mapName + System.getProperty("file.separator") + "map.yaml").toLowerCase()));
+	    	//input = new FileInputStream(new File(ResourceManager.MAPS_FOLDER +
+			//		(mapName + System.getProperty("file.separator") + "map.yaml").toLowerCase()));
+	    	input = ResourceManager.getInstance().OpenMapsFile(mapName + File.separator + "map.yaml");
 
-	    Yaml mapYaml = new Yaml();
-	    Map<String, Object> mapYamlMap = (Map) mapYaml.load(input);	    
+	    	Yaml mapYaml = new Yaml();
+	    	Map<String, Object> mapYamlMap = (Map) mapYaml.load(input);
 
-	    this.spawns = new ArrayList<>();
-	    Map<String, Object> spawnsMap = (Map) mapYamlMap.get("Spawns");
-	    for (Object v : spawnsMap.values()) {
-		Map<String, Object> actor = (Map) v;
+	    	this.spawns = new ArrayList<>();
+	    	Map<String, Object> spawnsMap = (Map) mapYamlMap.get("Spawns");
+	    	for (Object v : spawnsMap.values()) {
+				Map<String, Object> actor = (Map) v;
 
-		int x = (Integer) actor.get("LocationX");
-		int y = (Integer) actor.get("LocationY");
+				int x = (Integer) actor.get("LocationX");
+				int y = (Integer) actor.get("LocationY");
 
-		System.out.println("[MAP] Added spawn: (" + x + "; " + y + ")");
+				System.out.println("[MAP] Added spawn: (" + x + "; " + y + ")");
 
-		this.spawns.add(new Pos(x, y));
-	    }
+				this.spawns.add(new Pos(x, y));
+	    	}
 
 
-	    TileSet tileYamlSet = new TileSet(
-		    (String) mapYamlMap.get("Tileset"));
-	    this.tileSet = tileYamlSet;
+	    	TileSet tileYamlSet = new TileSet(
+			    (String) mapYamlMap.get("Tileset"));
+	    	this.tileSet = tileYamlSet;
 
-	    input = new FileInputStream(new File(ResourceManager.RESOURCE_FOLDER + (System.getProperty("file.separator") + "trees.yaml").toLowerCase()));
+	    	//input = new FileInputStream(new File(ResourceManager.RESOURCE_FOLDER +
+			//		(System.getProperty("file.separator") + "trees.yaml").toLowerCase()));
+	    	input = ResourceManager.getInstance().OpenResourcesFile("trees.yaml");
 
-	    Yaml treesYaml = new Yaml();
-	    Map<String, Object> treesYamlMap = (Map) mapYaml.load(input);	    
+	    	Yaml treesYaml = new Yaml();
+	    	Map<String, Object> treesYamlMap = (Map) mapYaml.load(input);
 
-	    this.mapEntities = new LinkedList<MapEntity>();
-	    Map<String, Object> entitiesMap = (Map) mapYamlMap.get("Actors");
-	    for (Object v : entitiesMap.values()) {
-		Map<String, Object> actor = (Map) v;
+	    	this.mapEntities = new LinkedList<MapEntity>();
+	    	Map<String, Object> entitiesMap = (Map) mapYamlMap.get("Actors");
+	    	for (Object v : entitiesMap.values()) {
+				Map<String, Object> actor = (Map) v;
 
-		String id = (String) actor.get("Name");
+				String id = (String) actor.get("Name");
 
-		String footprint = ((Map<String, String>) (((Map<String, Object>) treesYamlMap.get(id.toUpperCase())).get("Building"))).get("Footprint");
-		String dimensions = ((Map<String, String>) (((Map<String, Object>) treesYamlMap.get(id.toUpperCase())).get("Building"))).get("Dimensions");
-		//System.out.println("[MAP] Loaded Actor. ID: " + id + "(" + dimensions + "): " + footprint);
-		int x = (Integer) actor.get("LocationX");
-		int y = (Integer) actor.get("LocationY");
+				String footprint = ((Map<String, String>) (((Map<String, Object>) treesYamlMap.get(id.toUpperCase())).get("Building"))).get("Footprint");
+				String dimensions = ((Map<String, String>) (((Map<String, Object>) treesYamlMap.get(id.toUpperCase())).get("Building"))).get("Dimensions");
+				//System.out.println("[MAP] Loaded Actor. ID: " + id + "(" + dimensions + "): " + footprint);
+				int x = (Integer) actor.get("LocationX");
+				int y = (Integer) actor.get("LocationY");
 
-		ShpTexture st = ResourceManager.getInstance()
-			.getTemplateShpTexture(this.tileSet.getSetName(),
-				id + ".tem");
+				ShpTexture st = ResourceManager.getInstance()
+					.getTemplateShpTexture(this.tileSet.getSetName(),
+						id + ".tem");
 
-		if (st != null) {
-		    MapEntity me = new MapEntity(x, y, st, footprint, dimensions);
-		    this.mapEntities.add(me);
-		}
-	    }
+				if (st != null) {
+				    MapEntity me = new MapEntity(x, y, st, footprint, dimensions);
+				    this.mapEntities.add(me);
+				}
+	    	}
 
 	    this.theater = new Theater(this, this.tileSet);
 
@@ -124,23 +130,26 @@ public class TileMap {
 
 	} catch (FileNotFoundException e) {
 	    e.printStackTrace();
+	} catch (IOException e) {
+		e.printStackTrace();
 	}
-    }
+	}
 
     private void loadBinaryMap(String mapName) {
-	try (RandomAccessFile randomAccessFile = new RandomAccessFile(ResourceManager.MAPS_FOLDER + (mapName + System.getProperty("file.separator") + "map.bin").toLowerCase(), "r")) {
-	    FileChannel inChannel = randomAccessFile.getChannel();
+	try {
+	    	InputStream inputStream = ResourceManager.getInstance().OpenMapsFile(mapName + File.separator + "map.bin");
+			byte[] bytes = new byte[5];
+			inputStream.read(bytes);
 
-	    // Read one byte and pair of two shorts: map height and width
-	    ByteBuffer mapHeader = ByteBuffer.allocate(5);
-	    mapHeader.order(ByteOrder.LITTLE_ENDIAN);
-	    inChannel.read(mapHeader);
-	    mapHeader.rewind();
+	    	// Read one byte and pair of two shorts: map height and width
+	    	ByteBuffer mapHeader = ByteBuffer.wrap(bytes);
+	    	mapHeader.order(ByteOrder.LITTLE_ENDIAN);
+	    	mapHeader.rewind();
 
-	    if (mapHeader.get() != 1) {
-		System.err.println("Invalid map.");
-		return;
-	    }
+	    	if (mapHeader.get() != 1) {
+				System.err.println("Invalid map.");
+				return;
+	    	}
 
 	    this.width = mapHeader.getShort();
 	    this.height = mapHeader.getShort();
@@ -152,37 +161,37 @@ public class TileMap {
 	    System.out.println("Map size: " + this.width + " x " + this.height);
 
 	    // Height, Width and sizeof(short) + sizeof(byte)
-	    ByteBuffer mapBytes = BufferUtility.readRemaining(inChannel);
+	    ByteBuffer mapBytes = Utils.readRemainingStream(inputStream);
 	    mapBytes.order(ByteOrder.LITTLE_ENDIAN);
 
 	    Random r = new Random();
 	    for (int x = 0; x < this.width; x++) {
-		for (int y = 0; y < this.height; y++) {
-		    int tile = (int) (mapBytes.getShort() & 0xFFFF);
+			for (int y = 0; y < this.height; y++) {
+			    int tile = (int) (mapBytes.getShort() & 0xFFFF);
 
-		    short index = (short) (mapBytes.get() & 0xFF);
+			    short index = (short) (mapBytes.get() & 0xFF);
 
-		    // Randomize clear grass
-		    if (tile == GRASS_ID || tile == GRASS_ID_BIG) {
-			index = (short) r.nextInt(16);
-		    }
+			    // Randomize clear grass
+			    if (tile == GRASS_ID || tile == GRASS_ID_BIG) {
+				index = (short) r.nextInt(16);
+			    }
 
-		    this.mapTiles[x][y] = new TileReference<Integer, Byte>(
-			    tile, (byte) index);
-		}
+			    this.mapTiles[x][y] = new TileReference<Integer, Byte>(
+				    tile, (byte) index);
+			}
 	    }
 
 	    this.resourcesLayer = new ResourcesLayer(this);
 	    for (int x = 0; x < this.width; x++) {
-		for (int y = 0; y < this.height; y++) {
-		    byte tile = mapBytes.get();
-		    byte index = mapBytes.get();
+			for (int y = 0; y < this.height; y++) {
+			    byte tile = mapBytes.get();
+			    byte index = mapBytes.get();
 
 
-		    if (tile != 0) {
-			this.resourcesLayer.resources[x][y] = this.resourcesLayer.new ResourceCell(tile, index);
-		    }
-		}
+			    if (tile != 0) {
+				this.resourcesLayer.resources[x][y] = this.resourcesLayer.new ResourceCell(tile, index);
+			    }
+			}
 	    }	   
 
 	    this.resourcesLayer.setInitialDensity();
@@ -242,36 +251,36 @@ public class TileMap {
     }
 
     public void fillBlockingMap(int[][] blockingMap) {
-	for (int y = 0; y < this.height; y++) {
-	    for (int x = 0; x < this.width; x++) {
-		int id = (int) ((int) this.mapTiles[x][y].getTile() & 0xFFFF);
-		int index = (int) ((byte) this.mapTiles[x][y].getIndex() & 0xFF);
+		for (int y = 0; y < this.height; y++) {
+		    for (int x = 0; x < this.width; x++) {
+			int id = (int) ((int) this.mapTiles[x][y].getTile() & 0xFFFF);
+			int index = (int) ((byte) this.mapTiles[x][y].getIndex() & 0xFF);
 
-		Integer[] surfaces = this.theater.tilesSurfaces.get(id);
+			Integer[] surfaces = this.theater.tilesSurfaces.get(id);
 
-		if (surfaces != null && index >= surfaces.length) {
-		    continue;
+			if (surfaces != null && index >= surfaces.length) {
+			    continue;
+			}
+
+			if (surfaces != null) {
+			    blockingMap[x][y] = surfaces[index];
+			}
+		    }
 		}
 
-		if (surfaces != null) {
-		    blockingMap[x][y] = surfaces[index];
-		} 
-	    }
-	}
-
-	fillWithMapEntities(blockingMap);
+		fillWithMapEntities(blockingMap);
     }
 
     private void fillWithMapEntities(int[][] blockingMap) {
-	for (MapEntity me : this.mapEntities) {
-	    for (int cX = 0; cX < me.getWidth(); cX++) {
-		for (int cY = 0; cY < me.getHeight(); cY++) {
-		    if (blockingMap[me.getX() + cX][me.getY() + cY] == 0) { 
-			blockingMap[me.getX() + cX][me.getY() + cY] = me.getFootprintCells()[cX][cY]; 
+		for (MapEntity me : this.mapEntities) {
+		    for (int cX = 0; cX < me.getWidth(); cX++) {
+			for (int cY = 0; cY < me.getHeight(); cY++) {
+			    if (blockingMap[me.getX() + cX][me.getY() + cY] == 0) {
+				blockingMap[me.getX() + cX][me.getY() + cY] = me.getFootprintCells()[cX][cY];
+			    }
+			}
 		    }
 		}
-	    }
-	}
     }
 
     public TileSet getTileSet() {

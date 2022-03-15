@@ -21,6 +21,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 
+import redhorizon.filetypes.mix.MixRecordByteChannel;
+
 /**
  * Utility class for common buffer operations.
  * 
@@ -42,6 +44,9 @@ public class BufferUtility {
 	 * @param bytechannel
 	 * @return All remaining data in the stream.
 	 */
+	public static ByteBuffer readRemaining(MixRecordByteChannel bytechannel) {
+		return bytechannel.getRemainingBytes();
+	}
 	public static ByteBuffer readRemaining(ReadableByteChannel bytechannel) {
 
 		ArrayList<ByteBuffer> bytes = new ArrayList<>();
@@ -51,7 +56,7 @@ public class BufferUtility {
 			int read = -1;
 			try {
 				read = bytechannel.read(bytedata);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

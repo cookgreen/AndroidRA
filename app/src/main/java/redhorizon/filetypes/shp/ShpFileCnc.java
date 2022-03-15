@@ -16,6 +16,8 @@
 
 package redhorizon.filetypes.shp;
 
+import com.android.redalert.Utils;
+
 import redhorizon.filetypes.AnimationFile;
 import redhorizon.filetypes.FileExtensions;
 import redhorizon.filetypes.FileType;
@@ -52,7 +54,6 @@ public class ShpFileCnc extends ShpFile<ShpFileHeaderCnc> implements AnimationFi
 
 	// Save-to information
 	private static final int MAX_HEIGHT = 65535;
-
 
 	public ShpFileCnc(String name, InputStream inputStream) {
 
@@ -149,7 +150,7 @@ public class ShpFileCnc extends ShpFile<ShpFileHeaderCnc> implements AnimationFi
 
 		try {
 			ByteBuffer headerbytes = ByteBuffer.allocate(ShpFileHeaderCnc.HEADER_SIZE);
-			bytechannel.read(headerbytes);
+			headerbytes = bytechannel.readBytes(headerbytes);
 
 			// Construct file header
 			headerbytes.order(ByteOrder.LITTLE_ENDIAN);
