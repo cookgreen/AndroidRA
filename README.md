@@ -9,7 +9,7 @@ API 26 (Android 8.0)
 LibGDX (Android)  
 Slick2D (AE)  
 LWJGL (Android)  
-JavaRA - cr0s  
+[JavaRA - cr0s](https://github.com/Cr0s/JavaRA)  
 
 ## License  
 GPLv3
